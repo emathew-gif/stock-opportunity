@@ -1,0 +1,5 @@
+finnhub-python
+pandas
+openpyxl
+anthropic
+numpy
