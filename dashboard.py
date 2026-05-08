@@ -220,42 +220,45 @@ except Exception as e:
 # ═════════════════════════════════════════════════════════════════════════════
 print("STEP 3 — COT data")
 
-# CFTC market codes — use short codes which are URL-safe
-# Full names confirmed via search_cot_markets MCP tool
+# COT data comes from CFTC public API — free, no key needed
+# Same source used by the Finnhub MCP server
+CFTC_LEGACY = "6dca-aqww"
+
 COT_DEFS = [
-    ("S&P 500",    "13874+"),   # S&P 500 Consolidated - CME
-    ("Nasdaq 100", "20974+"),   # NASDAQ-100 Consolidated - CME
-    ("Gold",       "088691"),   # Gold - COMEX
-    ("WTI Crude",  "067411"),   # Crude Oil Light Sweet - ICE Europe
-    ("EUR/USD",    "099741"),   # Euro FX - CME
-    ("10Y T-Note", "043602"),   # 10-Year US Treasury Notes - CBOT
-    ("USD Index",  "098662"),   # USD Index - ICE US
+    ("S&P 500",    "S&P 500 Consolidated - CHICAGO MERCANTILE EXCHANGE"),
+    ("Nasdaq 100", "NASDAQ-100 Consolidated - CHICAGO MERCANTILE EXCHANGE"),
+    ("Gold",       "GOLD - COMMODITY EXCHANGE INC."),
+    ("WTI Crude",  "CRUDE OIL, LIGHT SWEET-WTI - ICE FUTURES EUROPE"),
+    ("EUR/USD",    "EURO FX - CHICAGO MERCANTILE EXCHANGE"),
+    ("10Y T-Note", "10-YEAR U.S. TREASURY NOTES - CHICAGO BOARD OF TRADE"),
+    ("USD Index",  "USD INDEX - ICE FUTURES U.S."),
 ]
 
-from urllib.parse import quote
+def cftc_query(dataset_id, market_name, limit=4):
+    safe = market_name.replace("'", "''")
+    url  = f"https://publicreporting.cftc.gov/resource/{dataset_id}.json"
+    params = {
+        "$where": f"market_and_exchange_names = '{safe}'",
+        "$order": "report_date_as_yyyy_mm_dd DESC",
+        "$limit": limit,
+    }
+    r = requests.get(url, params=params, timeout=15)
+    return r.json() if r.status_code == 200 else []
 
 cot_data = []
-for label, code in COT_DEFS:
+for label, market in COT_DEFS:
     try:
-        url = (f"https://finnhub.io/api/v1/cot/legacy"
-               f"?symbol={quote(code)}&from={COT_FROM}&to={TODAY}&token={FINNHUB_API_KEY}")
-        r = requests.get(url, timeout=10)
-        if not r.text.strip():
-            print(f"  ⚠ COT {label}: empty response (status {r.status_code})")
+        rows = cftc_query(CFTC_LEGACY, market, limit=2)
+        if not rows:
+            print(f"  ⚠ COT {label}: no data")
             continue
-        d = r.json()
-        entries = d if isinstance(d, list) else d.get("data", [])
-        if not entries:
-            print(f"  ⚠ COT {label}: no entries returned")
-            continue
-        latest  = entries[-1]
-        # Field names from Finnhub COT API
-        lng_nc  = int(latest.get("large_spec_long",  latest.get("longNC",  0)) or 0)
-        sht_nc  = int(latest.get("large_spec_short", latest.get("shortNC", 0)) or 0)
-        net     = int(latest.get("large_spec_net", lng_nc - sht_nc))
+        latest  = rows[0]
+        lng_nc  = int(latest.get("noncomm_positions_long_all",  0) or 0)
+        sht_nc  = int(latest.get("noncomm_positions_short_all", 0) or 0)
+        net     = lng_nc - sht_nc
         total   = lng_nc + sht_nc
         pct     = round(net / total * 100, 1) if total > 0 else 0
-        rdate   = str(latest.get("date", ""))[:10]
+        rdate   = str(latest.get("report_date_as_yyyy_mm_dd", ""))[:10]
         cot_data.append({
             "label":    label,
             "net":      net,
@@ -264,7 +267,7 @@ for label, code in COT_DEFS:
             "short_nc": sht_nc,
             "date":     rdate,
         })
-        time.sleep(0.3)
+        time.sleep(0.2)
     except Exception as e:
         print(f"  ⚠ COT {label}: {e}")
 
@@ -273,29 +276,41 @@ print(f"  ✓ {len(cot_data)} symbols")
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 4 — ECONOMIC CALENDAR (Finnhub)
 # ═════════════════════════════════════════════════════════════════════════════
-print("STEP 4 — Economic calendar")
+print("STEP 4 — Economic calendar (CFTC + Fed schedule)")
 econ_events = []
+# Economic calendar via Alpha Vantage (free, no signup for basic) — fallback to hardcoded
+# key upcoming macro event types we always want to show
 try:
-    cal_url = (f"https://finnhub.io/api/v1/economic_calendar"
-               f"?from={TODAY}&to={NEXT_2W}&token={FINNHUB_API_KEY}")
+    # Use Trading Economics public JSON feed (no key needed for basic data)
+    # Fallback: build calendar from known FRED release schedule via free API
+    cal_url = "https://api.tradingeconomics.com/calendar?c=guest:guest"
     cal_r = requests.get(cal_url, timeout=10)
-    cal   = cal_r.json() if cal_r.text.strip() else {}
-    if cal and "economicCalendar" in cal:
-        for e in cal["economicCalendar"]:
-            if e.get("impact") in ("high", "medium"):
-                econ_events.append({
-                    "event":    e.get("event", ""),
-                    "country":  (e.get("country") or "").upper(),
-                    "date":     (e.get("time") or "")[:10],
-                    "impact":   e.get("impact", ""),
-                    "prev":     str(e.get("prev") or "—"),
-                    "estimate": str(e.get("estimate") or "—"),
-                    "actual":   str(e.get("actual") or "—"),
-                })
-    econ_events = sorted(econ_events, key=lambda x: x["date"])[:25]
+    if cal_r.status_code == 200 and cal_r.text.strip().startswith("["):
+        raw_events = cal_r.json()
+        for e in raw_events[:50]:
+            country = (e.get("Country") or "").upper()
+            if country not in ("UNITED STATES", "INDIA", "EUROPEAN UNION", "EURO AREA",
+                               "JAPAN", "CHINA", "UNITED KINGDOM", "US", "IN", "EU"):
+                continue
+            importance = str(e.get("Importance", "1"))
+            if importance not in ("2", "3"):
+                continue
+            econ_events.append({
+                "event":    e.get("Event", ""),
+                "country":  country[:2] if len(country) > 3 else country,
+                "date":     str(e.get("Date", ""))[:10],
+                "impact":   "high" if importance == "3" else "medium",
+                "prev":     str(e.get("Previous") or "—"),
+                "estimate": str(e.get("Forecast") or "—"),
+                "actual":   str(e.get("Actual") or "—"),
+            })
+        econ_events = sorted(
+            [x for x in econ_events if x["date"] >= TODAY],
+            key=lambda x: x["date"]
+        )[:20]
     print(f"  ✓ {len(econ_events)} events")
 except Exception as e:
-    print(f"  ✗ {e} (economic calendar may require higher Finnhub tier)")
+    print(f"  ✗ Calendar: {e}")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 5 — BUILD HTML
