@@ -220,39 +220,42 @@ except Exception as e:
 # ═════════════════════════════════════════════════════════════════════════════
 print("STEP 3 — COT data")
 
-# Full CFTC market names (from search_cot_markets)
+# CFTC market codes — use short codes which are URL-safe
+# Full names confirmed via search_cot_markets MCP tool
 COT_DEFS = [
-    ("S&P 500",    "S&P 500 Consolidated - CHICAGO MERCANTILE EXCHANGE"),
-    ("Nasdaq 100", "NASDAQ-100 Consolidated - CHICAGO MERCANTILE EXCHANGE"),
-    ("Gold",       "GOLD - COMMODITY EXCHANGE INC."),
-    ("WTI Crude",  "CRUDE OIL, LIGHT SWEET-WTI - ICE FUTURES EUROPE"),
-    ("EUR/USD",    "EURO FX - CHICAGO MERCANTILE EXCHANGE"),
-    ("10Y T-Note", "10-YEAR U.S. TREASURY NOTES - CHICAGO BOARD OF TRADE"),
-    ("USD Index",  "USD INDEX - ICE FUTURES U.S."),
+    ("S&P 500",    "13874+"),   # S&P 500 Consolidated - CME
+    ("Nasdaq 100", "20974+"),   # NASDAQ-100 Consolidated - CME
+    ("Gold",       "088691"),   # Gold - COMEX
+    ("WTI Crude",  "067411"),   # Crude Oil Light Sweet - ICE Europe
+    ("EUR/USD",    "099741"),   # Euro FX - CME
+    ("10Y T-Note", "043602"),   # 10-Year US Treasury Notes - CBOT
+    ("USD Index",  "098662"),   # USD Index - ICE US
 ]
 
 from urllib.parse import quote
 
 cot_data = []
-for label, market in COT_DEFS:
+for label, code in COT_DEFS:
     try:
         url = (f"https://finnhub.io/api/v1/cot/legacy"
-               f"?symbol={quote(market)}&from={COT_FROM}&to={TODAY}&token={FINNHUB_API_KEY}")
+               f"?symbol={quote(code)}&from={COT_FROM}&to={TODAY}&token={FINNHUB_API_KEY}")
         r = requests.get(url, timeout=10)
         if not r.text.strip():
-            print(f"  ⚠ COT {label}: empty response")
+            print(f"  ⚠ COT {label}: empty response (status {r.status_code})")
             continue
         d = r.json()
         entries = d if isinstance(d, list) else d.get("data", [])
         if not entries:
+            print(f"  ⚠ COT {label}: no entries returned")
             continue
         latest  = entries[-1]
-        lng_nc  = int(latest.get("longNC",  latest.get("noncommercialLong",  0)) or 0)
-        sht_nc  = int(latest.get("shortNC", latest.get("noncommercialShort", 0)) or 0)
-        net     = lng_nc - sht_nc
+        # Field names from Finnhub COT API
+        lng_nc  = int(latest.get("large_spec_long",  latest.get("longNC",  0)) or 0)
+        sht_nc  = int(latest.get("large_spec_short", latest.get("shortNC", 0)) or 0)
+        net     = int(latest.get("large_spec_net", lng_nc - sht_nc))
         total   = lng_nc + sht_nc
         pct     = round(net / total * 100, 1) if total > 0 else 0
-        rdate   = str(latest.get("date", latest.get("reportDate", "")))[:10]
+        rdate   = str(latest.get("date", ""))[:10]
         cot_data.append({
             "label":    label,
             "net":      net,
