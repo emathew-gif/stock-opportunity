@@ -2,296 +2,398 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Market Pulse · 2026-05-08</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Market Pulse — 2026-05-08</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Instrument+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--ink:#0a0a0a;--ink2:#3a3a3a;--ink3:#7a7a7a;--paper:#f5f2eb;--paper2:#ede9e0;--paper3:#e4dfd3;--accent:#c8410a;--green:#1a6b3a;--red:#b52525;--gold:#b07d2a;--border:rgba(10,10,10,0.12);--serif:'DM Serif Display',Georgia,serif;--sans:'Instrument Sans',sans-serif;--mono:'DM Mono',monospace}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh}
-.masthead{border-bottom:2px solid var(--ink);padding:0 2rem;position:sticky;top:0;background:var(--paper);z-index:100;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;min-height:56px}
-.ml{display:flex;align-items:center;gap:.75rem}
-.pill{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);border:1px solid var(--border);padding:3px 8px;border-radius:2px}
-.title{font-family:var(--serif);font-size:22px;letter-spacing:-.02em;text-align:center;line-height:1.1}
-.mr{display:flex;align-items:center;justify-content:flex-end;gap:.75rem}
-.nav{font-family:var(--mono);font-size:11px;color:var(--ink3);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--border);border-radius:2px;transition:all .15s}
-.nav:hover,.nav.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.ts{font-family:var(--mono);font-size:10px;color:var(--ink3)}
-.page{max-width:1400px;margin:0 auto;padding:2rem}
-.section{margin-bottom:3rem}
-.sec-title{font-family:var(--serif);font-size:20px;letter-spacing:-.01em;margin-bottom:1.25rem;padding-bottom:.6rem;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:1rem}
-.sec-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.1em}
-.mkt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(--border);border:1px solid var(--border)}
-.card{background:var(--paper);padding:1.25rem 1.5rem}
-.card-title{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:.75rem}
-.mkt-row{display:grid;grid-template-columns:1fr auto auto;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--border);align-items:center}
-.mkt-row:last-child{border-bottom:none}
-.mkt-label{font-size:13px;color:var(--ink2)}
-.mkt-price{font-family:var(--mono);font-size:13px;font-weight:500;text-align:right}
-.mkt-chg{font-family:var(--mono);font-size:12px;min-width:72px;text-align:right}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-@media(max-width:700px){.two-col{grid-template-columns:1fr}}
-.dtable{width:100%;border-collapse:collapse;font-size:13px}
-.dtable th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding:.4rem .6rem;text-align:left;border-bottom:1px solid var(--ink)}
-.dtable td{padding:.45rem .6rem;border-bottom:1px solid var(--border)}
-.dtable tr:hover td{background:var(--paper2)}
-.price-cell{font-weight:500}
-.bond-panel{display:grid;grid-template-columns:1fr auto;gap:2rem;background:var(--paper2);border:1px solid var(--border);padding:1.5rem;align-items:start}
-.dur-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;min-width:180px}
-.dur-lbl{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;text-align:center}
-.dur-val{font-family:var(--serif);font-size:36px;line-height:1}
-.dur-desc{font-family:var(--mono);font-size:10px;color:var(--ink3);text-align:center}
-.cot-list{display:flex;flex-direction:column;gap:.75rem}
-.cot-row{background:var(--paper2);padding:1rem 1.25rem;border:1px solid var(--border)}
-.cot-meta{display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem;flex-wrap:wrap}
-.cot-label{font-size:14px;font-weight:600}
-.cot-badge{font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:2px 7px;border-radius:2px;font-weight:500}
-.cot-badge.up{background:rgba(26,107,58,.12);color:var(--green)}
-.cot-badge.down{background:rgba(181,37,37,.10);color:var(--red)}
-.cot-date{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:auto}
-.cot-track{height:6px;background:var(--paper3);border-radius:3px;overflow:hidden;margin-bottom:.5rem}
-.cot-bar{height:100%;border-radius:3px}
+:root{
+  --paper:#f5f2eb;--ink:#0a0a0a;--ink2:#3a3a3a;--ink3:#7a7a7a;
+  --paper2:#ede9e0;--paper3:#e4dfd3;
+  --accent:#c8410a;--green:#1a6b3a;--red:#b52525;--gold:#b07d2a;
+  --border:rgba(10,10,10,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:'Instrument Sans',sans-serif;font-size:13px;line-height:1.5}
+.mono{font-family:'DM Mono',monospace}
+.serif{font-family:'DM Serif Display',serif}
+a{color:inherit;text-decoration:none}
+
+/* MASTHEAD */
+.masthead{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 28px;gap:16px}
+.mast-left{display:flex;gap:8px;align-items:center}
+.pill{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border:1px solid var(--border);border-radius:20px;color:var(--ink3)}
+.pill.active{background:var(--ink);color:var(--paper)}
+.mast-center{font-family:'DM Serif Display',serif;font-size:24px;letter-spacing:-.3px}
+.mast-right{display:flex;align-items:center;gap:12px}
+.nav-link{font-size:12px;color:var(--ink3);padding:4px 10px;border-radius:4px;transition:.15s}
+.nav-link:hover,.nav-link.active{background:var(--paper3);color:var(--ink)}
+.ts{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3)}
+
+/* WRAPPER */
+.wrap{max-width:1200px;margin:0 auto;padding:24px 20px}
+.section-title{font-family:'DM Serif Display',serif;font-size:20px;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:16px}
+
+/* PERFORMANCE TABLE */
+.group-block{margin-bottom:28px}
+.group-title{font-size:11px;letter-spacing:.08em;color:var(--ink3);margin-bottom:8px}
+.perf-table{width:100%;border-collapse:collapse;font-size:12px}
+.perf-table th{text-align:right;padding:4px 8px;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);border-bottom:1px solid var(--border);font-weight:500;letter-spacing:.04em}
+.perf-table th:first-child{text-align:left}
+.perf-table td{padding:5px 8px;text-align:right;font-family:'DM Mono',monospace;border-bottom:1px solid rgba(10,10,10,0.06)}
+.perf-table td:first-child{text-align:left;font-family:'Instrument Sans',sans-serif}
+.perf-table td.price{font-weight:500}
+.perf-table td.name{font-size:12px}
+.perf-table td.sym{font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace}
+.perf-table tr:hover td{background:var(--paper2)}
+td.green{color:var(--green)}
+td.red{color:var(--red)}
+td.na{color:var(--ink3)}
+
+/* BONDS */
+.bond-grid{display:grid;grid-template-columns:1fr 200px;gap:20px;align-items:start;margin-bottom:28px}
+.dur-box{background:var(--paper2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.dur-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);letter-spacing:.06em;margin-bottom:6px}
+.dur-sig{font-size:15px;font-weight:500}
+.sig-green{color:var(--green)}
+.sig-amber{color:var(--gold)}
+
+/* COT */
+.cot-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+.cot-item{background:var(--paper2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.cot-header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.cot-name{font-weight:500;font-size:13px}
+.badge{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:10px;letter-spacing:.05em}
+.badge-long{background:#dcf3e8;color:var(--green)}
+.badge-short{background:#fde8e8;color:var(--red)}
+.cot-date{font-size:9px;color:var(--ink3);margin-left:auto}
+.cot-track{height:6px;background:var(--paper3);border-radius:3px;margin-bottom:6px;overflow:hidden}
+.cot-bar{height:100%;border-radius:3px;transition:.3s}
 .bar-long{background:var(--green)}
 .bar-short{background:var(--red)}
-.cot-nums{display:flex;gap:1.25rem;font-family:var(--mono);font-size:11px;color:var(--ink3);flex-wrap:wrap}
-.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--border);border:1px solid var(--border)}
-.news-card{background:var(--paper);padding:1.25rem 1.5rem;text-decoration:none;color:inherit;display:block;transition:background .15s}
-.news-card:hover{background:var(--paper2)}
-.news-meta{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
-.news-headline{font-size:14px;font-weight:500;line-height:1.4}
-.up{color:var(--green)}.down{color:var(--red)}
-.mono{font-family:var(--mono)}
-.footer{border-top:1px solid var(--border);margin-top:3rem;padding:1.5rem 2rem;font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center}
+.cot-nums{font-size:10px;color:var(--ink3)}
+.cot-na{font-size:11px;color:var(--ink3);font-style:italic}
+
+/* FOREX & COMMODITIES */
+.dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px}
+.sub-table{width:100%;border-collapse:collapse;font-size:12px}
+.sub-table th{text-align:right;padding:4px 8px;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);border-bottom:1px solid var(--border);font-weight:500}
+.sub-table th:first-child{text-align:left}
+.sub-table td{padding:5px 8px;text-align:right;font-family:'DM Mono',monospace;border-bottom:1px solid rgba(10,10,10,0.06)}
+.sub-table td:first-child{text-align:left;font-family:'Instrument Sans',sans-serif}
+.sub-table tr:hover td{background:var(--paper2)}
+.sub-title{font-size:11px;font-family:'DM Mono',monospace;color:var(--ink3);letter-spacing:.06em;margin-bottom:8px}
+
+/* NEWS */
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.news-card{background:var(--paper2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;transition:.15s;display:block}
+.news-card:hover{background:var(--paper3);border-color:rgba(10,10,10,0.2)}
+.news-meta{font-size:9px;color:var(--ink3);margin-bottom:5px;letter-spacing:.04em}
+.news-headline{font-size:12px;font-weight:500;line-height:1.4;color:var(--ink)}
+
+/* FOOTER */
+.footer{text-align:center;padding:20px;font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);border-top:1px solid var(--border);margin-top:8px}
+
+@media(max-width:768px){
+  .cot-grid,.dual-grid,.news-grid{grid-template-columns:1fr}
+  .bond-grid{grid-template-columns:1fr}
+  .perf-table th:nth-child(n+5),.perf-table td:nth-child(n+5){display:none}
+}
 </style>
 </head>
 <body>
+
 <header class="masthead">
-  <div class="ml"><span class="pill">Daily</span><span class="pill">v2</span></div>
-  <h1 class="title">Market Pulse</h1>
-  <div class="mr">
-    <a href="./" class="nav">Screener</a>
-    <a href="./dashboard.html" class="nav active">Dashboard</a>
-    <span class="ts">08 May 2026 · 12:15</span>
+  <div class="mast-left">
+    <span class="pill active mono">Daily · v3</span>
+    <span class="pill mono">Multi-Period</span>
+  </div>
+  <div class="mast-center serif">Market Pulse</div>
+  <div class="mast-right">
+    <a class="nav-link" href="./">Screener</a>
+    <a class="nav-link active" href="./dashboard.html">Dashboard</a>
+    <span class="ts mono">08 May 2026 · 12:55</span>
   </div>
 </header>
-<main class="page">
 
-  <section class="section">
-    <h2 class="sec-title">Market Snapshot <span class="sec-sub">ETF proxies · 1-day change</span></h2>
-    <div class="mkt-grid"><div class="card"><div class="card-title">US Markets</div><div class="mkt-row">
-      <span class="mkt-label">S&P 500</span>
-      <span class="mkt-price">731.58</span>
-      <span class="mkt-chg down">▼ -0.31%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">Nasdaq 100</span>
-      <span class="mkt-price">694.94</span>
-      <span class="mkt-chg down">▼ -0.12%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">Dow Jones</span>
-      <span class="mkt-price">495.91</span>
-      <span class="mkt-chg down">▼ -0.63%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">Russell 2000</span>
-      <span class="mkt-price">282.26</span>
-      <span class="mkt-chg down">▼ -1.58%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">VIX ETF</span>
-      <span class="mkt-price">26.85</span>
-      <span class="mkt-chg down">▼ -0.89%</span>
-    </div></div><div class="card"><div class="card-title">India</div><div class="mkt-row">
-      <span class="mkt-label">Nifty 50</span>
-      <span class="mkt-price">43.81</span>
-      <span class="mkt-chg down">▼ -0.68%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">India Broad</span>
-      <span class="mkt-price">43.71</span>
-      <span class="mkt-chg down">▼ -0.39%</span>
-    </div></div><div class="card"><div class="card-title">Europe</div><div class="mkt-row">
-      <span class="mkt-label">FTSE 100</span>
-      <span class="mkt-price">46.27</span>
-      <span class="mkt-chg down">▼ -2.47%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">DAX</span>
-      <span class="mkt-price">42.50</span>
-      <span class="mkt-chg down">▼ -2.23%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">CAC 40</span>
-      <span class="mkt-price">45.54</span>
-      <span class="mkt-chg down">▼ -2.53%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">Euro Stoxx</span>
-      <span class="mkt-price">66.53</span>
-      <span class="mkt-chg down">▼ -2.12%</span>
-    </div></div><div class="card"><div class="card-title">Asia Pacific</div><div class="mkt-row">
-      <span class="mkt-label">Japan</span>
-      <span class="mkt-price">90.99</span>
-      <span class="mkt-chg down">▼ -0.75%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">Hong Kong</span>
-      <span class="mkt-price">24.34</span>
-      <span class="mkt-chg down">▼ -0.21%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">China</span>
-      <span class="mkt-price">58.33</span>
-      <span class="mkt-chg down">▼ -0.65%</span>
-    </div><div class="mkt-row">
-      <span class="mkt-label">Australia</span>
-      <span class="mkt-price">29.48</span>
-      <span class="mkt-chg down">▼ -2.12%</span>
-    </div></div></div>
-  </section>
+<div class="wrap">
 
-  <section class="section">
-    <h2 class="sec-title">Forex &amp; Commodities <span class="sec-sub">Spot rates · front-month futures</span></h2>
-    <div class="two-col">
-      <table class="dtable">
-        <thead><tr><th>Pair</th><th>Rate</th><th>1D Change</th></tr></thead>
-        <tbody><tr><td>DXY (UUP)</td><td class='mono price-cell'>27.41</td><td class='mono up'>▲ +0.22%</td></tr><tr><td>USD/INR</td><td class='mono price-cell'>94.53</td><td class='mono '> —</td></tr><tr><td>EUR/USD</td><td class='mono price-cell'>1.1743</td><td class='mono '> —</td></tr><tr><td>USD/JPY</td><td class='mono price-cell'>156.84</td><td class='mono '> —</td></tr><tr><td>GBP/USD</td><td class='mono price-cell'>1.3581</td><td class='mono '> —</td></tr><tr><td>AUD/USD</td><td class='mono price-cell'>0.7224</td><td class='mono '> —</td></tr><tr><td>USD/CNY</td><td class='mono price-cell'>6.8044</td><td class='mono '> —</td></tr></tbody>
-      </table>
-      <table class="dtable">
-        <thead><tr><th>Commodity</th><th>Price</th><th>1D Change</th></tr></thead>
-        <tbody><tr><td>Gold (GLD)</td><td class="mono price-cell">431.68</td><td class="mono up">▲ +0.17%</td></tr><tr><td>Silver (SLV)</td><td class="mono price-cell">71.60</td><td class="mono up">▲ +2.10%</td></tr><tr><td>WTI Oil (USO)</td><td class="mono price-cell">134.97</td><td class="mono up">▲ +0.76%</td></tr><tr><td>Brent (BNO)</td><td class="mono price-cell">53.67</td><td class="mono up">▲ +0.26%</td></tr><tr><td>Copper (CPER)</td><td class="mono price-cell">37.35</td><td class="mono down">▼ -0.51%</td></tr><tr><td>Nat Gas (UNG)</td><td class="mono price-cell">10.68</td><td class="mono up">▲ +2.20%</td></tr></tbody>
-      </table>
+<!-- ── MARKET SNAPSHOT ──────────────────────────────────── -->
+<h2 class="section-title">Market Snapshot</h2>
+
+  <div class="group-block">
+    <h3 class="group-title mono">US MARKETS</h3>
+    <table class="perf-table">
+      <thead><tr>
+        <th>Market</th><th>Price</th>
+        <th>1D</th><th>1W</th><th>1M</th><th>3M</th><th>6M</th><th>1Y</th><th>YTD</th>
+      </tr></thead>
+      <tbody>
+    <tr>
+      <td class="name">S&P 500 <span class="sym">SPY</span></td>
+      <td class="price mono">$731.58</td>
+      <td class="red">-0.31%</td><td class="green">+1.80%</td><td class="green">+8.22%</td><td class="green">+7.96%</td><td class="green">+8.34%</td><td class="green">+29.47%</td><td class="green">+29.47%</td>
+    </tr>
+    <tr>
+      <td class="name">Nasdaq 100 <span class="sym">QQQ</span></td>
+      <td class="price mono">$694.94</td>
+      <td class="red">-0.12%</td><td class="green">+4.07%</td><td class="green">+14.66%</td><td class="green">+16.40%</td><td class="green">+12.22%</td><td class="green">+42.32%</td><td class="green">+42.32%</td>
+    </tr>
+    <tr>
+      <td class="name">Dow Jones <span class="sym">DIA</span></td>
+      <td class="price mono">$495.91</td>
+      <td class="red">-0.63%</td><td class="red">-0.15%</td><td class="green">+3.50%</td><td class="green">+1.43%</td><td class="green">+5.31%</td><td class="green">+19.82%</td><td class="green">+19.82%</td>
+    </tr>
+    <tr>
+      <td class="name">Russell 2000 <span class="sym">IWM</span></td>
+      <td class="price mono">$282.26</td>
+      <td class="red">-1.58%</td><td class="green">+1.54%</td><td class="green">+8.37%</td><td class="green">+10.33%</td><td class="green">+17.02%</td><td class="green">+40.30%</td><td class="green">+40.30%</td>
+    </tr>
+    <tr>
+      <td class="name">VIX ETF <span class="sym">VIXY</span></td>
+      <td class="price mono">$26.85</td>
+      <td class="red">-0.89%</td><td class="red">-1.36%</td><td class="red">-12.00%</td><td class="red">-5.52%</td><td class="red">-20.80%</td><td class="red">-54.61%</td><td class="red">-54.61%</td>
+    </tr></tbody>
+    </table>
+  </div>
+  <div class="group-block">
+    <h3 class="group-title mono">INDIA</h3>
+    <table class="perf-table">
+      <thead><tr>
+        <th>Market</th><th>Price</th>
+        <th>1D</th><th>1W</th><th>1M</th><th>3M</th><th>6M</th><th>1Y</th><th>YTD</th>
+      </tr></thead>
+      <tbody>
+    <tr>
+      <td class="name">Nifty 50 <span class="sym">INDY</span></td>
+      <td class="price mono">$43.81</td>
+      <td class="red">-0.68%</td><td class="green">+0.23%</td><td class="red">-1.24%</td><td class="red">-8.92%</td><td class="red">-17.01%</td><td class="red">-14.62%</td><td class="red">-14.62%</td>
+    </tr>
+    <tr>
+      <td class="name">India Broad <span class="sym">EPI</span></td>
+      <td class="price mono">$43.71</td>
+      <td class="red">-0.39%</td><td class="green">+0.44%</td><td class="green">+2.29%</td><td class="red">-4.31%</td><td class="red">-5.02%</td><td class="green">+0.32%</td><td class="green">+0.32%</td>
+    </tr></tbody>
+    </table>
+  </div>
+  <div class="group-block">
+    <h3 class="group-title mono">EUROPE</h3>
+    <table class="perf-table">
+      <thead><tr>
+        <th>Market</th><th>Price</th>
+        <th>1D</th><th>1W</th><th>1M</th><th>3M</th><th>6M</th><th>1Y</th><th>YTD</th>
+      </tr></thead>
+      <tbody>
+    <tr>
+      <td class="name">FTSE 100 <span class="sym">EWU</span></td>
+      <td class="price mono">$46.27</td>
+      <td class="red">-2.47%</td><td class="red">-1.87%</td><td class="red">-3.24%</td><td class="green">+0.72%</td><td class="green">+9.70%</td><td class="green">+21.41%</td><td class="green">+21.41%</td>
+    </tr>
+    <tr>
+      <td class="name">DAX <span class="sym">EWG</span></td>
+      <td class="price mono">$42.50</td>
+      <td class="red">-2.23%</td><td class="green">+0.57%</td><td class="green">+1.82%</td><td class="red">-0.79%</td><td class="green">+5.35%</td><td class="green">+5.04%</td><td class="green">+5.04%</td>
+    </tr>
+    <tr>
+      <td class="name">CAC 40 <span class="sym">EWQ</span></td>
+      <td class="price mono">$45.54</td>
+      <td class="red">-2.53%</td><td class="green">+0.46%</td><td class="red">-0.72%</td><td class="red">-0.42%</td><td class="green">+4.38%</td><td class="green">+10.21%</td><td class="green">+10.21%</td>
+    </tr>
+    <tr>
+      <td class="name">Euro Stoxx <span class="sym">FEZ</span></td>
+      <td class="price mono">$66.53</td>
+      <td class="red">-2.12%</td><td class="green">+0.85%</td><td class="green">+1.26%</td><td class="green">+0.56%</td><td class="green">+7.55%</td><td class="green">+16.21%</td><td class="green">+16.21%</td>
+    </tr></tbody>
+    </table>
+  </div>
+  <div class="group-block">
+    <h3 class="group-title mono">ASIA PACIFIC</h3>
+    <table class="perf-table">
+      <thead><tr>
+        <th>Market</th><th>Price</th>
+        <th>1D</th><th>1W</th><th>1M</th><th>3M</th><th>6M</th><th>1Y</th><th>YTD</th>
+      </tr></thead>
+      <tbody>
+    <tr>
+      <td class="name">Japan <span class="sym">EWJ</span></td>
+      <td class="price mono">$90.99</td>
+      <td class="red">-0.75%</td><td class="green">+2.12%</td><td class="green">+1.77%</td><td class="green">+5.68%</td><td class="green">+9.85%</td><td class="green">+26.67%</td><td class="green">+26.67%</td>
+    </tr>
+    <tr>
+      <td class="name">Hong Kong <span class="sym">EWH</span></td>
+      <td class="price mono">$24.34</td>
+      <td class="red">-0.21%</td><td class="green">+2.61%</td><td class="green">+2.40%</td><td class="green">+4.33%</td><td class="green">+11.34%</td><td class="green">+33.52%</td><td class="green">+33.52%</td>
+    </tr>
+    <tr>
+      <td class="name">China <span class="sym">MCHI</span></td>
+      <td class="price mono">$58.33</td>
+      <td class="red">-0.65%</td><td class="green">+1.32%</td><td class="green">+1.80%</td><td class="red">-2.95%</td><td class="red">-7.01%</td><td class="green">+9.13%</td><td class="green">+9.13%</td>
+    </tr>
+    <tr>
+      <td class="name">Australia <span class="sym">EWA</span></td>
+      <td class="price mono">$29.48</td>
+      <td class="red">-2.12%</td><td class="red">-0.03%</td><td class="red">-0.14%</td><td class="green">+5.89%</td><td class="green">+11.62%</td><td class="green">+18.73%</td><td class="green">+18.73%</td>
+    </tr></tbody>
+    </table>
+  </div>
+
+<!-- ── FOREX & COMMODITIES ──────────────────────────────── -->
+<h2 class="section-title">Forex &amp; Commodities</h2>
+<div class="dual-grid">
+  <div>
+    <div class="sub-title">FOREX (ETF PROXIES)</div>
+    <table class="sub-table">
+      <thead><tr><th>Pair</th><th>Price</th><th>1D</th><th>1W</th><th>1M</th><th>1Y</th></tr></thead>
+      <tbody>
+        <tr><td>DXY (UUP)</td><td class="price">$27.41</td><td class="green">+0.22%</td><td class="green">+0.18%</td><td class="red">-0.44%</td><td class="red">-1.19%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="sub-title">COMMODITIES</div>
+    <table class="sub-table">
+      <thead><tr><th>Commodity</th><th>Price</th><th>1D</th><th>1W</th><th>1M</th><th>1Y</th></tr></thead>
+      <tbody>
+        <tr><td>Gold</td><td class="price">$431.68</td><td class="green">+0.17%</td><td class="green">+1.89%</td><td class="red">-0.66%</td><td class="green">+41.71%</td></tr><tr><td>Silver</td><td class="price">$71.60</td><td class="green">+2.10%</td><td class="green">+7.41%</td><td class="green">+6.12%</td><td class="green">+143.04%</td></tr><tr><td>WTI Oil</td><td class="price">$134.97</td><td class="green">+0.76%</td><td class="red">-8.24%</td><td class="green">+8.34%</td><td class="green">+105.75%</td></tr><tr><td>Brent</td><td class="price">$53.67</td><td class="green">+0.26%</td><td class="red">-8.30%</td><td class="green">+11.77%</td><td class="green">+101.24%</td></tr><tr><td>Copper</td><td class="price">$37.35</td><td class="red">-0.51%</td><td class="green">+2.24%</td><td class="green">+5.96%</td><td class="green">+30.69%</td></tr><tr><td>Nat Gas</td><td class="price">$10.68</td><td class="green">+2.20%</td><td class="green">+0.75%</td><td class="red">-3.61%</td><td class="red">-40.90%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── BONDS ──────────────────────────────────────────────── -->
+<h2 class="section-title">Bond ETFs</h2>
+<div class="bond-grid">
+  <table class="perf-table">
+    <thead><tr><th>ETF</th><th>Price</th><th>1D</th><th>1W</th><th>1M</th><th>3M</th><th>6M</th><th>1Y</th><th>YTD</th></tr></thead>
+    <tbody>
+      <tr><td class='name'>TLT (20Y)</td><td class="price">$85.65</td><td class="red">-0.50%</td><td class="green">+0.04%</td><td class="red">-1.46%</td><td class="red">-2.09%</td><td class="red">-4.77%</td><td class="red">-1.46%</td><td class="red">-1.46%</td></tr><tr><td class='name'>IEF (7Y)</td><td class="price">$94.71</td><td class="red">-0.31%</td><td class="red">-0.28%</td><td class="red">-0.79%</td><td class="red">-1.42%</td><td class="red">-1.98%</td><td class="green">+0.46%</td><td class="green">+0.46%</td></tr><tr><td class='name'>SHY (1Y)</td><td class="price">$82.23</td><td class="red">-0.09%</td><td class="red">-0.30%</td><td class="red">-0.23%</td><td class="red">-0.76%</td><td class="red">-0.63%</td><td class="red">-0.27%</td><td class="red">-0.27%</td></tr>
+    </tbody>
+  </table>
+  <div class="dur-box">
+    <div class="dur-label">DURATION SIGNAL</div>
+    <div class="dur-sig sig-amber">Short end favoured</div>
+    <div style="margin-top:6px;font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3)">TLT 1D: -0.50% · SHY 1D: -0.09%</div>
+  </div>
+</div>
+
+<!-- ── COT POSITIONING ────────────────────────────────────── -->
+<h2 class="section-title">COT Positioning (Non-Commercial)</h2>
+<div class="cot-grid">
+  
+  <div class="cot-item">
+    <div class="cot-header">
+      <span class="cot-name">S&P 500</span>
+      <span class="badge badge-short">NET SHORT -17.4%</span>
+      <span class="cot-date mono">2026-04-28</span>
     </div>
-  </section>
-
-  <section class="section">
-    <h2 class="sec-title">US Treasury Bond ETFs <span class="sec-sub">Price ↓ = yields rising · TLT=long · IEF=mid · SHY=short</span></h2>
-    <div class="bond-panel">
-      <table class="dtable">
-        <thead><tr><th>ETF</th><th>Price</th><th>1D Change</th></tr></thead>
-        <tbody><tr><td>20Y+ Bonds (TLT)</td><td class="mono price-cell">85.65</td><td class="mono down">▼ -0.50%</td></tr><tr><td>7-10Y Bonds (IEF)</td><td class="mono price-cell">94.71</td><td class="mono down">▼ -0.31%</td></tr><tr><td>1-3Y Bonds (SHY)</td><td class="mono price-cell">82.23</td><td class="mono down">▼ -0.09%</td></tr></tbody>
-      </table>
-      <div class="dur-box">
-        <div class="dur-lbl">Duration Signal (TLT vs SHY)</div>
-        <div class="dur-val down">-0.41%</div>
-        <div class="dur-desc">Short end outperforming</div>
-      </div>
+    <div class="cot-track"><div class="cot-bar bar-short" style="width:17.4%"></div></div>
+    <div class="cot-nums mono">Long 238,327 · Short 338,849 · Net -100,522</div>
+  </div>
+  <div class="cot-item">
+    <div class="cot-header">
+      <span class="cot-name">Nasdaq 100</span>
+      <span class="badge badge-short">NET SHORT -4.3%</span>
+      <span class="cot-date mono">2026-04-28</span>
     </div>
-  </section>
+    <div class="cot-track"><div class="cot-bar bar-short" style="width:4.3%"></div></div>
+    <div class="cot-nums mono">Long 66,824 · Short 72,797 · Net -5,973</div>
+  </div>
+  <div class="cot-item">
+    <div class="cot-header">
+      <span class="cot-name">Gold</span>
+      <span class="badge badge-long">NET LONG +60.4%</span>
+      <span class="cot-date mono">2026-04-28</span>
+    </div>
+    <div class="cot-track"><div class="cot-bar bar-long" style="width:60.4%"></div></div>
+    <div class="cot-nums mono">Long 211,818 · Short 52,247 · Net +159,571</div>
+  </div>
+  <div class="cot-item">
+    <div class="cot-header">
+      <span class="cot-name">WTI Crude</span>
+      <span class="badge badge-short">NET SHORT -17.3%</span>
+      <span class="cot-date mono">2026-04-28</span>
+    </div>
+    <div class="cot-track"><div class="cot-bar bar-short" style="width:17.3%"></div></div>
+    <div class="cot-nums mono">Long 94,786 · Short 134,518 · Net -39,732</div>
+  </div>
+  <div class="cot-item">
+    <div class="cot-header">
+      <span class="cot-name">EUR/USD</span>
+      <span class="badge badge-long">NET LONG +9.0%</span>
+      <span class="cot-date mono">2026-04-28</span>
+    </div>
+    <div class="cot-track"><div class="cot-bar bar-long" style="width:9.0%"></div></div>
+    <div class="cot-nums mono">Long 217,091 · Short 181,379 · Net +35,712</div>
+  </div>
+  <div class="cot-item">
+    <div class="cot-header">
+      <span class="cot-name">USD Index</span>
+      <span class="badge badge-long">NET LONG +15.1%</span>
+      <span class="cot-date mono">2026-04-28</span>
+    </div>
+    <div class="cot-track"><div class="cot-bar bar-long" style="width:15.1%"></div></div>
+    <div class="cot-nums mono">Long 17,180 · Short 12,672 · Net +4,508</div>
+  </div>
+</div>
 
-  <section class="section">
-    <h2 class="sec-title">COT — Speculator Positioning <span class="sec-sub">Non-commercial net · CFTC weekly · as of 28 Apr 2026</span></h2>
-    <div class="cot-list"><div class="cot-row">
-      <div class="cot-meta">
-        <span class="cot-label">S&P 500</span>
-        <span class="cot-badge down">NET SHORT 17%</span>
-        <span class="cot-date">2026-04-28</span>
-      </div>
-      <div class="cot-track"><div class="cot-bar bar-short" style="width:17.4%"></div></div>
-      <div class="cot-nums">
-        <span class="up">▲ 238,327 long</span>
-        <span class="down">▼ 338,849 short</span>
-        <span>Net -100,522</span>
-      </div>
-    </div><div class="cot-row">
-      <div class="cot-meta">
-        <span class="cot-label">Nasdaq 100</span>
-        <span class="cot-badge down">NET SHORT 4%</span>
-        <span class="cot-date">2026-04-28</span>
-      </div>
-      <div class="cot-track"><div class="cot-bar bar-short" style="width:4.3%"></div></div>
-      <div class="cot-nums">
-        <span class="up">▲ 66,824 long</span>
-        <span class="down">▼ 72,797 short</span>
-        <span>Net -5,973</span>
-      </div>
-    </div><div class="cot-row">
-      <div class="cot-meta">
-        <span class="cot-label">Gold</span>
-        <span class="cot-badge up">NET LONG 60%</span>
-        <span class="cot-date">2026-04-28</span>
-      </div>
-      <div class="cot-track"><div class="cot-bar bar-long" style="width:60.4%"></div></div>
-      <div class="cot-nums">
-        <span class="up">▲ 211,818 long</span>
-        <span class="down">▼ 52,247 short</span>
-        <span>Net +159,571</span>
-      </div>
-    </div><div class="cot-row">
-      <div class="cot-meta">
-        <span class="cot-label">WTI Crude</span>
-        <span class="cot-badge down">NET SHORT 17%</span>
-        <span class="cot-date">2026-04-28</span>
-      </div>
-      <div class="cot-track"><div class="cot-bar bar-short" style="width:17.3%"></div></div>
-      <div class="cot-nums">
-        <span class="up">▲ 94,786 long</span>
-        <span class="down">▼ 134,518 short</span>
-        <span>Net -39,732</span>
-      </div>
-    </div><div class="cot-row">
-      <div class="cot-meta">
-        <span class="cot-label">EUR/USD</span>
-        <span class="cot-badge up">NET LONG 9%</span>
-        <span class="cot-date">2026-04-28</span>
-      </div>
-      <div class="cot-track"><div class="cot-bar bar-long" style="width:9.0%"></div></div>
-      <div class="cot-nums">
-        <span class="up">▲ 217,091 long</span>
-        <span class="down">▼ 181,379 short</span>
-        <span>Net +35,712</span>
-      </div>
-    </div><div class="cot-row">
-      <div class="cot-meta">
-        <span class="cot-label">USD Index</span>
-        <span class="cot-badge up">NET LONG 15%</span>
-        <span class="cot-date">2026-04-28</span>
-      </div>
-      <div class="cot-track"><div class="cot-bar bar-long" style="width:15.1%"></div></div>
-      <div class="cot-nums">
-        <span class="up">▲ 17,180 long</span>
-        <span class="down">▼ 12,672 short</span>
-        <span>Net +4,508</span>
-      </div>
-    </div></div>
-  </section>
+<!-- ── NEWS ──────────────────────────────────────────────── -->
+<h2 class="section-title">Market News</h2>
+<div class="news-grid">
+  
+  <a class="news-card" href="https://www.cnbc.com/2026/05/08/uk-election-result-keir-starmer-reform-uk-green-council-markets-gilts.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 08 May 12:04</div>
+    <div class="news-headline">UK bond vigilantes circle gilts as election losses hit PM Starmer</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMitgFBVV95cUxQSmpLMVc2WnQyMWdudGxDV2FFdFhmX2xFTXM3a2ZhNXJsZUoxUkR2Vm9WZG9JUGRycmFZbEZXQzFqRFRnSGtjTzZmT2ZZNm5oU0dIeE1JWm9qTklYSnJYaVlWQUk2Mm01bFYzOHJwT0NmSUI5bFgzcHdkejZWX1luaWdQbWlwZzYzS1Z1VkwtZy1rUm9jRWc1X2xoRFNzeUF3d0pTU2dScG8teURDVkhacktjdXNmQQ?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 12:02</div>
+    <div class="news-headline">Toyota expects $4.3 billion hit from Iran war - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMipgFBVV95cUxQaTVBbDBvdzFZanpianJoRWhuYVlrWDd3VVBEVjV5ZU5UNEVLZFo2ZXZrbTlLWEpIZkhtTDhLd0g0MGM5eTl4RXRlWHFnbmhHVVVTUDVxNndSMGZzZHhMaEY1eEtnVVl3MFlFc2NmU3BQYXFmLUZqaGJQclZRZEZzRVNOSnVFSzVIc3dlVlhvTWN1MmJpV0ZvdHhwZTFvTUpkTExaYmR3?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 08:57</div>
+    <div class="news-headline">Indian shares decline on oil spike as US-Iran attacks dent peace hopes - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxORUN2eVpZOFVtaGhyRHZCdHNTWVJrMmVzOHVJbzZ0dnUyMVh5UTJlVjM3c0x1b1pPMnp2bWpwdXdhc01LdU5taGxQY0FMVU1hMjV6VjhoM2tvd2Z6bVR3NDAxZDJQLXlJdkNZUFRYdnZPTU9VQXVQak1rblFfZlM5Y2F3T09vazFzOEFDc3J1OVdSUkhEWHVuWlA2emtjNm9PNXRKeWoxQ1MwZDg?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 07:42</div>
+    <div class="news-headline">Southeast Asian leaders seek strategy to ease impacts of Iran war - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMixgFBVV95cUxOaG9nWFIyNS0xRHQ0VDZFdnNHQTZtMjQtbzhOUS1HWjg0MG9CLXBBb0Y0WjNFVGppR2hUWjllMllXSjNJMGdfUEluSklFNktiR1FQM1VRVnlDa1JVUmZsSFpZRDJBNGdOZzk1clRKc3NIZGpOX0VQMTlha1R3TVUtS0daUGQyRUNHVEtqa2txSFlmVEtqT0wtaW5qRGpxeFRxWnhxWlZkcTVOYnlsR2UwNHBvVmJTRXZKM1k0UWlFLVRTR2xCdUE?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 07:39</div>
+    <div class="news-headline">Trump says ceasefire still holds after fighting between the US and Iran flares - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMiswFBVV95cUxOZXM5QVhTWjRwT2VVN2NHZzlpdFlfTXM3ZDBEMUVmNmx3dlg3aUtfQXVnR2ZBRjNlWmtVVUpSNXlRY2RDQkV4V2tlYnQtR1JwQWtnVFlrajE0ckpiMDc5eGViWVQ5WTU1XzV6Q3lfbXJpOEx3N3EzcHNzMGVtaVpCeVBCUTdBUWt4MTkwZ2VkU2VFOG4wQjM2d2pjNlVURTNucDJwNHQ4Z2ZFRU1XUDZReWpjVQ?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 05:28</div>
+    <div class="news-headline">Gold set for weekly gain as markets focus on US-Iran peace deal prospects - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMixgFBVV95cUxNd3NZN05xVGplemF2SDFVTGVETGVBazE2b3VyUTVhS1N0TXRoRjFFdFNwNUZKbGhxSlBobE9maGJMOHEwTzRBb1k4YkFPVExfVkJvYk9jd0QzNmc5aWFTclJmakViTnVyY2F5N0ltTWRxdjNuWW1oM05yZFZUN1A1ZlpaUEZYOFg5ZXMxYVdGSmYyTzFONXRKNlpLb2VUVkpFdmVPV0I2S0dhajBSaVROR1FsSW9MLVZMVlZMZk9lMzRLb2ZlSmc?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 05:25</div>
+    <div class="news-headline">Dollar dips despite U.S.-Iran clashes, yen buoyed by intervention risk - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMiugFBVV95cUxNVlJfWDQzY2NaSHU5WGpJVHB0ZDNPYXVlZHIyWGRJSGR1Q080QXR2Tm1UdHhmMVRzYUs0aC0tZDRZdVlQOXZkRFRGb25pMjMzUTFBRWpYN1AzeVNYOTRoWGZqVGx2QUdOdDBfa0prMDZTS2NrbFhjQnYzeTVlaWZpWnZweGhuWURBQjJLN1hZWkVKRkRhOThiMUQ3T2VxNG0xMXQ1amN1V21QeVBYY2g5R1Z2MlN1SEMzTkE?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 02:47</div>
+    <div class="news-headline">Trump says 'great damage' done to Iranian attackers after US Navy destroyers came under fire - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMilAFBVV95cUxPb1ZZWVlWYlVTaXhlS2ZkTnQ0UUhrNGpVbTRVeHhMRGpkNmRSMTdySFdQWTZBT3VIa1d4VXRqZ3hXZklsX0V1MkxOSmN3LW9GUnV6UFFySXE5YnhXTmpiM3FQUTFlQ2ZmNkFvVG95ckZnX29oZVlRdnNxaElDWG1YeTlzczR1UkhxR1RXcWhqdzdQdDQx?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 02:20</div>
+    <div class="news-headline">Oil prices gain on renewed US-Iran hostilities - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMiugFBVV95cUxPOE1uOURBaC03bzROOEdzRzdQOGFvc1hOanMxM2w2NS0wOFc2ei1Ga1JDMHBTd0QtVzh4ZGdXSE16TFhkM1lXTWRZXzZ3bDM1SFo3Y1JfXzRoV09fQmJZSUZmOHNpWVptcjBKanJxM21GUS1Ncjc2Qm1rOTFkTk9yck9XWWRfZVk2QWNrdHZNWGIxUEkwX29aMDZ5em5ZaHZfcWlTQ2tncGh5WXFRT2Q0NnhyOXJZU3dYOWc?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 02:07</div>
+    <div class="news-headline">US military says it carries out retaliatory strikes against Iran - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxPRFFjYzMybXlET01QRW9uRjY5Z0tyQndJNXdvVHFoUWRmMHNJelJXdUZVV3pKRzlZd0RnRmhGdlFPb1dZZmtvQTkxYWpNMHRfTi1hcXdsSDB3b2Q3dTkxQmVrNVd1TUVYTjVkajdnNTk5QlN5WFdESkdMUEJXNjNwY21aWEw1eG51aW5nenhsUFk2UGRSdVZwYTF2QWVVcnE1RGxlcks1c0dJQQ?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 02:03</div>
+    <div class="news-headline">Iran accuses US of violating ceasefire with new attacks - Reuters</div>
+  </a>
+  <a class="news-card" href="https://news.google.com/rss/articles/CBMivwFBVV95cUxOcnplWTR4X2ZCYk1JNWVNTEkzbXM3WWlEX1BVWW1oREU4UjRCQXp0bU0zSzNZUF91SkZzeWFnQ2RTR0xVck1xTGlwX2JpX0JpVm9QOXVOWTRZdzRUMVZLTTlRUGFCaHBYaHZidUFNWVowc2VacjF6eUwwWTFBeF9tRXJidVQzQ1N3RFdqR2RIejhOcVpxXzNlQ0JOeGdoVkhEZERBMUN1aTRmWkdaN09sSkVKR1M5MGNXZUM0X0Y4TQ?oc=5" target="_blank" rel="noopener">
+    <div class="news-meta mono">Reuters · 08 May 01:32</div>
+    <div class="news-headline">US navy came under missile fire after US attack on Iranian oil tanker, Iran state media says - Reuters</div>
+  </a>
+</div>
 
-  <section class="section">
-    <h2 class="sec-title">Market News <span class="sec-sub">via Finnhub</span></h2>
-    <div class="news-grid"><a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxNd3NZN05xVGplemF2SDFVTGVETGVBazE2b3VyUTVhS1N0TXRoRjFFdFNwNUZKbGhxSlBobE9maGJMOHEwTzRBb1k0YkFPVExfVkJvYk9jd0QzNmc5aWFTclJmakViTnVyY2F5N0ltTWRxdjNuWW1oM05yZFZUN1A1ZlpaUEZYOFg5ZXMxYVdGSmYyTzFONXRKNlpLb2VUVkpFdmVPV0I2S0dhajBSaVROR1FsSW9MLVZMVlZMZk9lMzRLb2ZlSmc" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 07:29</div>
-      <div class="news-headline">Dollar steady as US-Iran hostilities flare, yen steadied by intervention risk</div>
-    </a><a href="https://news.google.com/rss/articles/CBMipgFBVV95cUxQaTVBbDBvdzFZanpianJoRWhuYVlrWDd3VVBEVjV5ZU5UNEVLZFo2ZXZrbTlLWEpIZkhtTDhLd0g0MGM5eTl4RXRlWHFnbmhHVVVTUDVxNndSMGZzZHhMaEY1eEtnVVl3MFlFc2NmU3BQYXFmLUZqaGJQclZRZEZzRVNOSnVFSzVIc3dlVlhvTWN1MmJpV0ZvdHhwZTFvTUpkTExaYmR3" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 07:14</div>
-      <div class="news-headline">Indian shares decline on oil spike as US-Iran attacks dent peace hopes</div>
-    </a><a href="https://news.google.com/rss/articles/CBMiswFBVV95cUxOZXM5QVhTWjRwT2VVN2NHZzlpdFlfTXM3ZDBEMUVmNmx3dlg3aUtfQXVnR2ZBRjNlWmtVVUpSNXlRY2RDQkV4V2tlYnQtR1JwQWtnVFlrajE0ckpiMDc5eGViWVQ5WTU1XzV6Q3lfbXJpOEx3N3EzcHNzMGVtaVpCeVBCUTdBUWt4MTkwZ2VkU2VFOG4wQjM2d2pjNlVURTNucDJwNHQ4Z2ZFRU1XUDZReWpjVQ" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 05:48</div>
-      <div class="news-headline">Gold set for weekly gain as markets focus on US-Iran deal prospects</div>
-    </a><a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxPb1ZZWVlWYlVTaXhlS2ZkTnQ0UUhrNGpVbTRVeHhMRGpkNmRSMTdySFdQWTZBT3VIa1d4VXRqZ3hXZklsX0V1MkxOSmN3LW9GUnV6UFFySXE5YnhXTmpiM3FQUTFlQ2ZmNkFvVG95ckZnX29oZVlRdnNxaElDWG1YeTlzczR1UkhxR1RXcWhqdzdQdDQx" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 02:40</div>
-      <div class="news-headline">Oil prices gain on renewed US-Iran hostilities</div>
-    </a><a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxQSmpLMVc2WnQyMWdudGxDV2FFdFhmX2xFTXM3a2ZhNXJsZUoxUkR2Vm9WZG9JUGRycmFZbEZXQzFqRFRnSGtjTzZmT2ZZNm5oU0dIeE1JWm9qTklYSnJYaVlWQUk2Mm01bFYzOHJwT0NmSUI5bFgzcHdkejZWX1luaWdQbWlwZzYzS1Z1VkwtZy1rUm9jRWc1X2xoRFNzeUF3d0pTU2dScG8teURDVkhacktjdXNmQQ" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 07:28</div>
-      <div class="news-headline">Toyota halves quarterly profit as Iran crisis hits</div>
-    </a><a href="https://news.google.com/rss/articles/CBMiugFBVV95cUxPOE1uOURBaC03bzROOEdzRzdQOGFvc1hOanMxM2w2NS0wOFc2ei1Ga1JDMHBTd0QtVzh4ZGdXSE16TFhkM1lXTWRZXzZ3bDM1SFo3Y1JfXzRoV09fQmJZSUZmOHNpWVptcjBKanJxM21GUS1Ncjc2Qm1rOTFkTk9yck9XWWRfZVk2QWNrdHZNWGIxUEkwX29aMDZ5em5ZaHZfcWlTQ2tncGh5WXFRT2Q0NnhyOXJZU3dYOWc" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 02:27</div>
-      <div class="news-headline">US military says it carries out retaliatory strikes against Iran</div>
-    </a><a href="https://www.cnbc.com/2026/05/07/ai-winners-software-datadog-stock.html" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">CNBC · 08 May · 02:08</div>
-      <div class="news-headline">Datadog stock soars 31% on blockbuster earnings as AI winners emerge in software</div>
-    </a><a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxOaG9nWFIyNS0xRHQ0VDZFdnNHQTZtMjQtbzhOUS1HWjg0MG9CLXBBb0Y0WjNFVGppR2hUWjllMllXSjNJMGdfUEluSklFNktiR1FQM1FVVnlDa1JVUmZsSFpZRDJBNGdOZzk1clRKc3NIZGpOX0VQMTlha1R3TVUtS0daUGQyRUNHVEtqa2txSFlmVEtqT0wtaW5qRGpxeFRxWnhxWlZkcTVOYnlsR2UwNHBvVmJTRXZKM1k0UWlFLVRTR2xCdUE" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 01:52</div>
-      <div class="news-headline">Trump says ceasefire still holds after fighting between the US and Iran flares</div>
-    </a><a href="https://news.google.com/rss/articles/CBMitwFBVV95cUxNdmtGQjBLakhyaEF5QmdfVFZMaHpPa1Y0UXFGY2dQWjFfakVaWGw1dzZaWkVhV2k1ekF6cFAxbjVSSF8xSDl0XzRSYnY5Z0trbldEOHcxUVJwR05OaW4zVU1SOVBublVYX3JOS2ViMkZRdWJScFg1X3lYSUx2T0lKdkdfRjdLNXdOWkdVVDJ2Zkt6VGJmTVAtS1dZTVlZS1oyUFFOWTJPUnB1cFJZUVJMSFJOUFFvOWc" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 01:37</div>
-      <div class="news-headline">Energy markets headed into troubled waters amid Iran war, head of IEA says</div>
-    </a><a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxPRFFjYzMybXlET01QRW9uRjY5Z0tyQndJNXdvVHFoUWRmMHNJelJXdUZVV3pKRzlZd0RnRmhGdlFPb1dZZmtvQTkxYWpNMHRfTi1hcXdsSDB3b2Q3dTkxQmVrNVd1TUVYTjVkajdnNTk5QlN5WFdESkdMUEJXNjNwY21aWEw1eG51aW5nenhsUFk2UGRSdVZwYTF2QWVVcnE1RGxlcks1c0dJQQ" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 01:23</div>
-      <div class="news-headline">Iran accuses US of violating ceasefire with new attacks</div>
-    </a><a href="https://news.google.com/rss/articles/CBMiuwFBVV95cUxPdlktdk1TSHNxMnpibXJ6ZHR5OE5WMUNoSk5uQ1V1emRjZUppOThfM3J1YTNKMHBjMFNtcW9WREw4ZW5ELXRSUk5GRGpWZFZ5QlhHRFEwRE1PdjVKR3ZBdW02SzFrQ0ZtRV91X2NFZVpzX0JMZmVvV0s2bXZTeVFWNzlUMklCM0w0WnNKMUVlUEVrTVNqRWxtU1o3NElvNlJJeHR6VHZhRmZiRVJpaVB6bDVpV3FEZjBacmVj" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 01:21</div>
-      <div class="news-headline">US targets Iraq oil official and militias with sanctions for aiding Iran</div>
-    </a><a href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxORUN2eVpZOFVtaGhyRHZCdHNTWVJrMmVzOHVJbzZ0dnUyMVh5UTJlVjM3c0x1b1pPMnp2bWpwdXdhc01LdU5taGxQY0FMVU1hMjV6VjhoM2tvd2Z6bVR3NDAxZDJQLXlJdkNZUFRYdnZPTU9VQXVQak1rblFfZlM5Y2F3T09vazFzOEFDc3J1OVdSUkhEWHVuWlA2emtjNm9PNXRKeWoxQ1MwZDg" target="_blank" rel="noopener" class="news-card">
-      <div class="news-meta">Reuters · 08 May · 00:02</div>
-      <div class="news-headline">Southeast Asian leaders seek strategy to ease impacts of Iran war</div>
-    </a></div>
-  </section>
+</div><!-- /wrap -->
 
-</main>
 <footer class="footer">
-  Data: Finnhub · CFTC &nbsp;·&nbsp; Generated 08 May 2026 · 12:15 &nbsp;·&nbsp; Personal research only — not financial advice
+  Data: Finnhub · CFTC &nbsp;|&nbsp; Generated 08 May 2026 · 12:55 &nbsp;|&nbsp; Personal research only — not investment advice
 </footer>
+
 </body>
 </html>
