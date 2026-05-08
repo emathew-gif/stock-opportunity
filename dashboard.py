@@ -5,8 +5,9 @@ Generates HTML pushed to GitHub Pages alongside the stock screener.
 Run daily on PythonAnywhere.
 
 Data sources:
-  - yfinance  : indices, forex, commodities, yields
-  - Finnhub   : news, COT positioning, economic calendar
+  - Finnhub   : all price data (quotes + forex), news, COT, economic calendar
+  Note: yfinance removed — PythonAnywhere blocks Yahoo Finance connections.
+  US-listed ETF proxies used for international indices.
 """
 
 import json, base64, requests, time
@@ -42,114 +43,155 @@ def arrow(v):
     return "▲" if v > 0 else "▼"
 
 # ═════════════════════════════════════════════════════════════════════════════
-# STEP 1 — PRICE DATA (yfinance)
+# STEP 1 — PRICE DATA (Finnhub quotes + forex rates)
+# ETF proxies used for international indices since yfinance is blocked
+# on PythonAnywhere. All data via Finnhub API.
 # ═════════════════════════════════════════════════════════════════════════════
 print("=" * 60)
-print("STEP 1 — Price data")
+print("STEP 1 — Price data (Finnhub)")
 print("=" * 60)
 
-try:
-    import yfinance as yf
-    YF_OK = True
-except ImportError:
-    YF_OK = False
-    print("  ⚠  yfinance not installed — run: pip install yfinance")
+def fh_quote(symbol):
+    """Fetch current price + daily % change from Finnhub."""
+    try:
+        q = fh.quote(symbol)
+        if not q or not q.get("c"):
+            return {"price": None, "chg_pct": None}
+        price = q["c"]
+        return {
+            "price":    round(price, 4 if price < 10 else 2),
+            "chg_pct": round(q.get("dp") or 0, 2),
+        }
+    except Exception:
+        return {"price": None, "chg_pct": None}
 
-# (label, ticker, group)
-MARKET_DEFS = [
-    ("S&P 500",      "^GSPC",     "US Markets"),
-    ("Nasdaq 100",   "^NDX",      "US Markets"),
-    ("Dow Jones",    "^DJI",      "US Markets"),
-    ("Russell 2000", "^RUT",      "US Markets"),
-    ("VIX",          "^VIX",      "US Markets"),
-    ("Nifty 50",     "^NSEI",     "India"),
-    ("Sensex",       "^BSESN",    "India"),
-    ("Bank Nifty",   "^NSEBANK",  "India"),
-    ("Nifty IT",     "^CNXIT",    "India"),
-    ("FTSE 100",     "^FTSE",     "Europe"),
-    ("DAX",          "^GDAXI",    "Europe"),
-    ("CAC 40",       "^FCHI",     "Europe"),
-    ("Euro Stoxx 50","^STOXX50E", "Europe"),
-    ("Nikkei 225",   "^N225",     "Asia Pacific"),
-    ("Hang Seng",    "^HSI",      "Asia Pacific"),
-    ("Shanghai",     "000001.SS", "Asia Pacific"),
-    ("ASX 200",      "^AXJO",     "Asia Pacific"),
-    ("DXY",          "DX=F",      "Forex"),
-    ("USD/INR",      "USDINR=X",  "Forex"),
-    ("EUR/USD",      "EURUSD=X",  "Forex"),
-    ("USD/JPY",      "USDJPY=X",  "Forex"),
-    ("GBP/USD",      "GBPUSD=X",  "Forex"),
-    ("AUD/USD",      "AUDUSD=X",  "Forex"),
-    ("USD/CNY",      "USDCNY=X",  "Forex"),
-    ("Gold",         "GC=F",      "Commodities"),
-    ("Silver",       "SI=F",      "Commodities"),
-    ("WTI Crude",    "CL=F",      "Commodities"),
-    ("Brent Crude",  "BZ=F",      "Commodities"),
-    ("Copper",       "HG=F",      "Commodities"),
-    ("Nat. Gas",     "NG=F",      "Commodities"),
-    ("US 2Y",        "^IRX",      "Yields"),
-    ("US 5Y",        "^FVX",      "Yields"),
-    ("US 10Y",       "^TNX",      "Yields"),
-    ("US 30Y",       "^TYX",      "Yields"),
+# ── Index ETF proxies (label, finnhub_symbol, group) ─────────────────────────
+# SPY/QQQ/DIA/IWM are the standard US ETFs tracking the major indices.
+# EWU/EWG/EWQ etc. are iShares country ETFs — good daily proxies.
+# INDY/EPI/SCIF track Indian markets in USD.
+INDEX_DEFS = [
+    ("S&P 500 (SPY)",     "SPY",   "US Markets"),
+    ("Nasdaq 100 (QQQ)",  "QQQ",   "US Markets"),
+    ("Dow Jones (DIA)",   "DIA",   "US Markets"),
+    ("Russell 2000 (IWM)","IWM",   "US Markets"),
+    ("VIX ETF (VIXY)",    "VIXY",  "US Markets"),
+    ("Nifty 50 (INDY)",   "INDY",  "India"),
+    ("India Broad (EPI)", "EPI",   "India"),
+    ("India Small (SCIF)","SCIF",  "India"),
+    ("FTSE 100 (EWU)",    "EWU",   "Europe"),
+    ("DAX (EWG)",         "EWG",   "Europe"),
+    ("CAC 40 (EWQ)",      "EWQ",   "Europe"),
+    ("Euro Stoxx (FEZ)",  "FEZ",   "Europe"),
+    ("Japan (EWJ)",       "EWJ",   "Asia Pacific"),
+    ("Hong Kong (EWH)",   "EWH",   "Asia Pacific"),
+    ("China (MCHI)",      "MCHI",  "Asia Pacific"),
+    ("Australia (EWA)",   "EWA",   "Asia Pacific"),
 ]
 
-all_tickers = [t for _, t, _ in MARKET_DEFS]
-prices = {}
+COMMODITY_DEFS = [
+    ("Gold (GLD)",      "GLD"),
+    ("Silver (SLV)",    "SLV"),
+    ("WTI Oil (USO)",   "USO"),
+    ("Brent (BNO)",     "BNO"),
+    ("Copper (CPER)",   "CPER"),
+    ("Nat Gas (UNG)",   "UNG"),
+]
 
-if YF_OK:
-    try:
-        raw = yf.download(
-            all_tickers, period="1mo", interval="1d",
-            progress=False, group_by="ticker",
-            auto_adjust=True, threads=True
-        )
-        for ticker in all_tickers:
-            try:
-                df = raw[ticker] if len(all_tickers) > 1 else raw
-                df = df.dropna(subset=["Close"])
-                if len(df) < 2:
-                    prices[ticker] = {"price": None, "chg_pct": None}
-                    continue
-                close = float(df["Close"].iloc[-1])
-                prev  = float(df["Close"].iloc[-2])
-                chg   = round((close - prev) / prev * 100, 2)
-                dp    = 4 if close < 10 else 2
-                prices[ticker] = {"price": round(close, dp), "chg_pct": chg}
-            except Exception:
-                prices[ticker] = {"price": None, "chg_pct": None}
-        ok = sum(1 for v in prices.values() if v["price"])
-        print(f"  ✓ {ok}/{len(all_tickers)} tickers")
-    except Exception as e:
-        print(f"  ✗ yfinance: {e}")
-        prices = {t: {"price": None, "chg_pct": None} for t in all_tickers}
-else:
-    prices = {t: {"price": None, "chg_pct": None} for t in all_tickers}
+BOND_DEFS = [
+    ("20Y+ Bonds (TLT)", "TLT"),
+    ("7-10Y Bonds (IEF)","IEF"),
+    ("1-3Y Bonds (SHY)", "SHY"),
+]
 
-def px(ticker):
-    return prices.get(ticker, {"price": None, "chg_pct": None})
+# Fetch all quotes with a small sleep to respect rate limits
+print("  Fetching index ETFs...")
+index_prices = {}
+for label, sym, grp in INDEX_DEFS:
+    index_prices[sym] = fh_quote(sym)
+    time.sleep(0.12)
 
+print("  Fetching commodities...")
+commod_prices = {}
+for label, sym in COMMODITY_DEFS:
+    commod_prices[sym] = fh_quote(sym)
+    time.sleep(0.12)
+
+print("  Fetching bond ETFs...")
+bond_prices = {}
+for label, sym in BOND_DEFS:
+    bond_prices[sym] = fh_quote(sym)
+    time.sleep(0.12)
+
+ok = sum(1 for v in {**index_prices, **commod_prices}.values() if v.get("price"))
+print(f"  ✓ {ok}/{len(INDEX_DEFS)+len(COMMODITY_DEFS)} instruments fetched")
+
+# ── Forex via Finnhub forex_rates ─────────────────────────────────────────────
+print("  Fetching forex rates...")
+forex_list = []
+try:
+    raw_rates = fh.forex_rates(base="USD").get("quote", {})
+
+    # Also fetch UUP (USD bull ETF) for DXY proxy with % change
+    uup = fh_quote("UUP")
+    time.sleep(0.12)
+
+    FOREX_DISPLAY = [
+        ("DXY (UUP proxy)", None,  None,   uup),
+        ("USD/INR",         "INR", False,  None),
+        ("EUR/USD",         "EUR", True,   None),   # inverse: 1/rate
+        ("USD/JPY",         "JPY", False,  None),
+        ("GBP/USD",         "GBP", True,   None),   # inverse
+        ("AUD/USD",         "AUD", True,   None),   # inverse
+        ("USD/CNY",         "CNY", False,  None),
+    ]
+    for label, currency, inverse, override in FOREX_DISPLAY:
+        if override is not None:
+            forex_list.append({"label": label, **override})
+        elif currency and currency in raw_rates:
+            r = raw_rates[currency]
+            price = round(1/r, 4) if inverse else round(r, 4)
+            forex_list.append({"label": label, "price": price, "chg_pct": None})
+        else:
+            forex_list.append({"label": label, "price": None, "chg_pct": None})
+    print(f"  ✓ Forex: {len([f for f in forex_list if f.get('price')])} rates")
+except Exception as e:
+    print(f"  ✗ Forex: {e}")
+    forex_list = [{"label": l, "price": None, "chg_pct": None}
+                  for l in ["DXY","USD/INR","EUR/USD","USD/JPY","GBP/USD","AUD/USD","USD/CNY"]]
+
+# ── Assemble grouped data ─────────────────────────────────────────────────────
 def get_group(name):
     return [
-        {"label": l, "ticker": t, **px(t)}
-        for l, t, g in MARKET_DEFS if g == name
+        {"label": l, "ticker": t,
+         **index_prices.get(t, {"price": None, "chg_pct": None})}
+        for l, t, g in INDEX_DEFS if g == name
     ]
 
 indices_us    = get_group("US Markets")
 indices_india = get_group("India")
 indices_eu    = get_group("Europe")
 indices_asia  = get_group("Asia Pacific")
-forex_list    = get_group("Forex")
-commod_list   = get_group("Commodities")
-yield_list    = get_group("Yields")
 
-# 2Y–10Y spread
-y2  = px("^IRX")["price"]
-y10 = px("^TNX")["price"]
-spread_val = round(y10 - y2, 2) if y2 and y10 else None
-spread_str = (("+" if spread_val > 0 else "") + f"{spread_val}%") if spread_val is not None else "—"
+commod_list = [
+    {"label": l, "ticker": t, **commod_prices.get(t, {"price": None, "chg_pct": None})}
+    for l, t in COMMODITY_DEFS
+]
+
+yield_list = [
+    {"label": l, "ticker": t, **bond_prices.get(t, {"price": None, "chg_pct": None})}
+    for l, t in BOND_DEFS
+]
+
+# Bond spread proxy: TLT/SHY price ratio as loose long-short indicator
+tlt_p = bond_prices.get("TLT", {}).get("price")
+shy_p = bond_prices.get("SHY", {}).get("price")
+tlt_c = bond_prices.get("TLT", {}).get("chg_pct")
+shy_c = bond_prices.get("SHY", {}).get("chg_pct")
+spread_val = round(tlt_c - shy_c, 2) if tlt_c is not None and shy_c is not None else None
+spread_str = (("+" if spread_val and spread_val > 0 else "") + f"{spread_val}%") if spread_val is not None else "—"
 spread_cls = chg_cls(spread_val)
-spread_lbl = ("NORMAL — positive slope" if spread_val and spread_val > 0
-              else "INVERTED — negative slope" if spread_val and spread_val < 0 else "—")
+spread_lbl = ("Long duration outperforming" if spread_val and spread_val > 0
+              else "Short end outperforming" if spread_val and spread_val is not None else "—")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # STEP 2 — NEWS (Finnhub)
@@ -607,8 +649,8 @@ body {{ font-family: var(--sans); background: var(--paper); color: var(--ink); m
   <!-- ── YIELD CURVE ── -->
   <section class="section">
     <h2 class="section-title">
-      US Yield Curve
-      <span class="section-sub">Treasury yields %</span>
+      US Treasury Bond ETFs
+      <span class="section-sub">Price moves INVERSE to yield · TLT=long, IEF=mid, SHY=short</span>
     </h2>
     <div class="yield-panel">
       <table class="dtable">
@@ -616,7 +658,7 @@ body {{ font-family: var(--sans); background: var(--paper); color: var(--ink); m
         <tbody>{yield_html}</tbody>
       </table>
       <div class="spread-box">
-        <div class="spread-lbl">2Y – 10Y Spread</div>
+        <div class="spread-lbl">TLT vs SHY (1D)</div>
         <div class="spread-val {spread_cls}">{spread_str}</div>
         <div class="spread-desc">{spread_lbl}</div>
       </div>
