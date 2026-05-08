@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:    #0a0a0a;
+  --ink2:   #3a3a3a;
+  --ink3:   #7a7a7a;
+  --paper:  #f5f2eb;
+  --paper2: #ede9e0;
+  --paper3: #e4dfd3;
+  --accent: #c8410a;
+  --accent2:#1a3a5c;
+  --green:  #1a6b3a;
+  --red:    #b52525;
+  --gold:   #b07d2a;
+  --border: rgba(10,10,10,0.12);
+  --serif:  'DM Serif Display', Georgia, serif;
+  --sans:   'Instrument Sans', sans-serif;
+  --mono:   'DM Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+/* ── MASTHEAD ── */
+.masthead {
+  border-bottom: 2px solid var(--ink);
+  padding: 0 2rem;
+  position: sticky; top: 0;
+  background: var(--paper); z-index: 100;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: 1rem; min-height: 56px;
+}
+.masthead-left { display: flex; align-items: center; gap: .75rem; }
+.label-pill {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .15em; text-transform: uppercase;
+  color: var(--ink3); border: 1px solid var(--border);
+  padding: 3px 8px; border-radius: 2px;
+}
+.masthead-title {
+  font-family: var(--serif); font-size: 22px;
+  letter-spacing: -.02em; text-align: center; line-height: 1.1;
+}
+.masthead-right { display: flex; align-items: center; justify-content: flex-end; gap: .75rem; }
+.nav-link {
+  font-family: var(--mono); font-size: 11px; color: var(--ink3);
+  text-decoration: none; letter-spacing: .1em; text-transform: uppercase;
+  padding: 4px 10px; border: 1px solid var(--border);
+  border-radius: 2px; transition: all .15s;
+}
+.nav-link:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.nav-link.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.ts { font-family: var(--mono); font-size: 10px; color: var(--ink3); }
+
+/* ── LAYOUT ── */
+.page { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+.section { margin-bottom: 3rem; }
+.section-title {
+  font-family: var(--serif); font-size: 20px;
+  letter-spacing: -.01em; margin-bottom: 1.25rem;
+  padding-bottom: .6rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: baseline; gap: 1rem;
+}
+.section-sub { font-family: var(--mono); font-size: 10px; color: var(--ink3); letter-spacing: .1em; }
+
+/* ── MARKET GRID ── */
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+}
+.card { background: var(--paper); padding: 1.25rem 1.5rem; }
+.card-title {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .15em; text-transform: uppercase;
+  color: var(--ink3); margin-bottom: .75rem;
+}
+.mkt-row {
+  display: grid; grid-template-columns: 1fr auto auto;
+  gap: .5rem; padding: .35rem 0;
+  border-bottom: 1px solid var(--border); align-items: center;
+}
+.mkt-row:last-child { border-bottom: none; }
+.mkt-label { font-size: 13px; color: var(--ink2); }
+.mkt-price { font-family: var(--mono); font-size: 13px; font-weight: 500; text-align: right; }
+.mkt-chg { font-family: var(--mono); font-size: 12px; min-width: 72px; text-align: right; }
+
+/* ── TWO-COL DATA TABLES ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+.dtable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dtable th {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink3);
+  padding: .4rem .6rem; text-align: left;
+  border-bottom: 1px solid var(--ink);
+}
+.dtable td { padding: .45rem .6rem; border-bottom: 1px solid var(--border); }
+.dtable tr:hover td { background: var(--paper2); }
+.price-cell { font-weight: 500; }
+
+/* ── YIELD PANEL ── */
+.yield-panel {
+  display: grid; grid-template-columns: 1fr auto; gap: 2rem;
+  background: var(--paper2); border: 1px solid var(--border); padding: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 600px) { .yield-panel { grid-template-columns: 1fr; } }
+.spread-box {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .5rem; min-width: 180px;
+}
+.spread-lbl { font-family: var(--mono); font-size: 10px; color: var(--ink3); letter-spacing: .1em; text-transform: uppercase; text-align: center; }
+.spread-val { font-family: var(--serif); font-size: 40px; line-height: 1; }
+.spread-desc { font-family: var(--mono); font-size: 10px; color: var(--ink3); text-align: center; }
+
+/* ── COT ── */
+.cot-list { display: flex; flex-direction: column; gap: .75rem; }
+.cot-row {
+  background: var(--paper2); padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+}
+.cot-meta { display: flex; align-items: center; gap: .75rem; margin-bottom: .5rem; flex-wrap: wrap; }
+.cot-label { font-size: 14px; font-weight: 600; }
+.cot-badge {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .08em; padding: 2px 7px;
+  border-radius: 2px; font-weight: 500;
+}
+.cot-badge.up  { background: rgba(26,107,58,.12); color: var(--green); }
+.cot-badge.down { background: rgba(181,37,37,.10); color: var(--red); }
+.cot-date { font-family: var(--mono); font-size: 10px; color: var(--ink3); margin-left: auto; }
+.cot-track {
+  height: 6px; background: var(--paper3);
+  border-radius: 3px; overflow: hidden; margin-bottom: .5rem;
+}
+.cot-bar { height: 100%; border-radius: 3px; }
+.bar-long  { background: var(--green); }
+.bar-short { background: var(--red); }
+.cot-nums { display: flex; gap: 1.25rem; font-family: var(--mono); font-size: 11px; color: var(--ink3); flex-wrap: wrap; }
+
+/* ── ECONOMIC CALENDAR ── */
+.cal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cal-table th {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink3);
+  padding: .4rem .75rem; text-align: left;
+  border-bottom: 1px solid var(--ink);
+}
+.cal-table td { padding: .5rem .75rem; border-bottom: 1px solid var(--border); }
+.cal-table tr:hover td { background: var(--paper2); }
+.cbadge {
+  font-family: var(--mono); font-size: 10px;
+  background: var(--ink); color: var(--paper);
+  padding: 2px 5px; border-radius: 2px;
+}
+.edate { font-family: var(--mono); font-size: 12px; color: var(--ink3); white-space: nowrap; }
+.idot {
+  display: inline-block; width: 7px; height: 7px;
+  border-radius: 50%; margin-right: 4px; vertical-align: middle;
+}
+.impact-high { background: var(--red); }
+.impact-med  { background: var(--gold); }
+
+/* ── NEWS ── */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+}
+.news-card {
+  background: var(--paper); padding: 1.25rem 1.5rem;
+  text-decoration: none; color: inherit; display: block;
+  transition: background .15s;
+}
+.news-card:hover { background: var(--paper2); }
+.news-meta {
+  font-family: var(--mono); font-size: 10px; color: var(--ink3);
+  letter-spacing: .08em; text-transform: uppercase; margin-bottom: .4rem;
+}
+.news-headline { font-size: 14px; font-weight: 500; line-height: 1.4; margin-bottom: .4rem; }
+.news-summary  { font-size: 12px; color: var(--ink3); line-height: 1.5; }
+
+/* ── UTILITIES ── */
+.up   { color: var(--green); }
+.down { color: var(--red); }
+.mono { font-family: var(--mono); }
+.empty { color: var(--ink3); font-size: 13px; padding: 1rem; font-family: var(--mono); font-style: italic; }
+
+/* ── FOOTER ── */
+.footer {
+  border-top: 1px solid var(--border); margin-top: 3rem;
+  padding: 1.5rem 2rem;
+  font-family: var(--mono); font-size: 11px; color: var(--ink3); text-align: center;
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-left">
+    <span class="label-pill">Daily</span>
+    <span class="label-pill">v1</span>
+  </div>
+  <h1 class="masthead-title">Market Pulse</h1>
+  <div class="masthead-right">
+    <a href="./" class="nav-link">Screener</a>
+    <a href="./dashboard.html" class="nav-link active">Dashboard</a>
+    <span class="ts">08 May 2026 · 07:14</span>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- ── MARKET SNAPSHOT ── -->
+  <section class="section">
+    <h2 class="section-title">
+      Market Snapshot
+      <span class="section-sub">Indices · 1-day change</span>
+    </h2>
+    <div class="market-grid">
+      
+    <div class="card">
+      <div class="card-title">US Markets</div>
+      
+        <div class="mkt-row">
+          <span class="mkt-label">S&P 500</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">Nasdaq 100</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">Dow Jones</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">Russell 2000</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">VIX</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+    </div>
+    <div class="card">
+      <div class="card-title">India</div>
+      
+        <div class="mkt-row">
+          <span class="mkt-label">Nifty 50</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">Sensex</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">Bank Nifty</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">Nifty IT</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Europe</div>
+      
+        <div class="mkt-row">
+          <span class="mkt-label">FTSE 100</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">DAX</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">CAC 40</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">Euro Stoxx 50</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Asia Pacific</div>
+      
+        <div class="mkt-row">
+          <span class="mkt-label">Nikkei 225</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">Hang Seng</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">Shanghai</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+        <div class="mkt-row">
+          <span class="mkt-label">ASX 200</span>
+          <span class="mkt-price">—</span>
+          <span class="mkt-chg "> —</span>
+        </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ── FOREX & COMMODITIES ── -->
+  <section class="section">
+    <h2 class="section-title">
+      Forex &amp; Commodities
+      <span class="section-sub">Spot / front-month futures</span>
+    </h2>
+    <div class="two-col">
+      <table class="dtable">
+        <thead><tr><th>Pair</th><th>Rate</th><th>1D Change</th></tr></thead>
+        <tbody><tr>
+      <td>DXY</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>USD/INR</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>EUR/USD</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>USD/JPY</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>GBP/USD</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>AUD/USD</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>USD/CNY</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr></tbody>
+      </table>
+      <table class="dtable">
+        <thead><tr><th>Commodity</th><th>Price</th><th>1D Change</th></tr></thead>
+        <tbody><tr>
+      <td>Gold</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>Silver</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>WTI Crude</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>Brent Crude</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>Copper</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>Nat. Gas</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── YIELD CURVE ── -->
+  <section class="section">
+    <h2 class="section-title">
+      US Yield Curve
+      <span class="section-sub">Treasury yields %</span>
+    </h2>
+    <div class="yield-panel">
+      <table class="dtable">
+        <thead><tr><th>Tenor</th><th>Yield</th><th>1D Change</th></tr></thead>
+        <tbody><tr>
+      <td>US 2Y</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>US 5Y</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>US 10Y</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr><tr>
+      <td>US 30Y</td>
+      <td class="mono price-cell">—</td>
+      <td class="mono "> —</td>
+    </tr></tbody>
+      </table>
+      <div class="spread-box">
+        <div class="spread-lbl">2Y – 10Y Spread</div>
+        <div class="spread-val ">—</div>
+        <div class="spread-desc">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── COT POSITIONING ── -->
+  <section class="section">
+    <h2 class="section-title">
+      COT — Speculative Positioning
+      <span class="section-sub">Non-commercial (speculator) net longs · CFTC weekly</span>
+    </h2>
+    <div class="cot-list">
+      <p class='empty'>COT data unavailable — check symbol mapping</p>
+    </div>
+  </section>
+
+  <!-- ── ECONOMIC CALENDAR ── -->
+  <section class="section">
+    <h2 class="section-title">
+      Economic Calendar
+      <span class="section-sub">Next 14 days · high &amp; medium impact</span>
+    </h2>
+    <table class="cal-table">
+      <thead>
+        <tr>
+          <th>Country</th><th>Date</th><th>Event</th><th>Impact</th>
+          <th>Previous</th><th>Estimate</th><th>Actual</th>
+        </tr>
+      </thead>
+      <tbody><tr><td colspan='7' class='empty'>No events found — economic calendar may require Finnhub premium</td></tr></tbody>
+    </table>
+  </section>
+
+  <!-- ── NEWS ── -->
+  <section class="section">
+    <h2 class="section-title">
+      Market News
+      <span class="section-sub">via Finnhub</span>
+    </h2>
+    <div class="news-grid">
+      
+    <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxOaG9nWFIyNS0xRHQ0VDZFdnNHQTZtMjQtbzhOUS1HWjg0MG9CLXBBb0Y0WjNFVGppR2hUWjllMllXSjNJMGdfUEluSklFNktiR1FQM1VRVnlDa1JVUmZsSFpZRDJBNGdOZzk1clRKc3NIZGpOX0VQMTlha1R3TVUtS0daUGQyRUNHVEtqa2txSFlmVEtqT0wtaW5qRGpxeFRxWnhxWlZkcTVOYnlsR2UwNHBvVmJTRXZKM1k0UWlFLVRTR2xCdUE?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 08 May · 05:12</div>
+      <div class="news-headline">Trump says ceasefire still holds after fighting between the US and Iran flares - Reuters</div>
+      <div class="news-summary">Trump says ceasefire still holds after fighting between the US and Iran flares  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxNd3NZN05xVGplemF2SDFVTGVETGVBazE2b3VyUTVhS1N0TXRoRjFFdFNwNUZKbGhxSlBobE9maGJMOHEwTzRBb1k4YkFPVExfVkJvYk9jd0QzNmc5aWFTclJmakViTnVyY2F5N0ltTWRxdjNuWW1oM05yZFZUN1A1ZlpaUEZYOFg5ZXMxYVdGSmYyTzFONXRKNlpLb2VUVkpFdmVPV0I2S0dhajBSaVROR1FsSW9MLVZMVlZMZk9lMzRLb2ZlSmc?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 08 May · 05:09</div>
+      <div class="news-headline">Dollar steady as US-Iran hostilities flare, yen steadied by intervention risk - Reuters</div>
+      <div class="news-summary">Dollar steady as US-Iran hostilities flare, yen steadied by intervention risk  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMiswFBVV95cUxOZXM5QVhTWjRwT2VVN2NHZzlpdFlfTXM3ZDBEMUVmNmx3dlg3aUtfQXVnR2ZBRjNlWmtVVUpSNXlRY2RDQkV4V2tlYnQtR1JwQWtnVFlrajE0ckpiMDc5eGViWVQ5WTU1XzV6Q3lfbXJpOEx3N3EzcHNzMGVtaVpCeVBCUTdBUWt4MTkwZ2VkU2VFOG4wQjM2d2pjNlVURTNucDJwNHQ4Z2ZFRU1XUDZReWpjVQ?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 08 May · 04:25</div>
+      <div class="news-headline">Gold on track for weekly gain; markets focus on US-Iran deal prospects - Reuters</div>
+      <div class="news-summary">Gold on track for weekly gain; markets focus on US-Iran deal prospects  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxORUN2eVpZOFVtaGhyRHZCdHNTWVJrMmVzOHVJbzZ0dnUyMVh5UTJlVjM3c0x1b1pPMnp2bWpwdXdhc01LdU5taGxQY0FMVU1hMjV6VjhoM2tvd2Z6bVR3NDAxZDJQLXlJdkNZUFRYdnZPTU9VQXVQak1rblFfZlM5Y2F3T09vazFzOEFDc3J1OVdSUkhEWHVuWlA2emtjNm9PNXRKeWoxQ1MwZDg?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 08 May · 03:42</div>
+      <div class="news-headline">Southeast Asian leaders seek strategy to ease impacts of Iran war - Reuters</div>
+      <div class="news-summary">Southeast Asian leaders seek strategy to ease impacts of Iran war  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMipgFBVV95cUxQaTVBbDBvdzFZanpianJoRWhuYVlrWDd3VVBEVjV5ZU5UNEVLZFo2ZXZrbTlLWEpIZkhtTDhLd0g0MGM5eTl4RXRlWHFnbmhHVVVTUDVxNndSMGZzZHhMaEY1eEtnVVl3MFlFc2NmU3BQYXFmLUZqaGJQclZRZEZzRVNOSnVFSzVIc3dlVlhvTWN1MmJpV0ZvdHhwZTFvTUpkTExaYmR3?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 08 May · 03:14</div>
+      <div class="news-headline">Indian shares decline on oil spike as US-Iran attacks dent peace hopes - Reuters</div>
+      <div class="news-summary">Indian shares decline on oil spike as US-Iran attacks dent peace hopes  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxPb1ZZWVlWYlVTaXhlS2ZkTnQ0UUhrNGpVbTRVeHhMRGpkNmRSMTdySFdQWTZBT3VIa1d4VXRqZ3hXZklsX0V1MkxOSmN3LW9GUnV6UFFySXE5YnhXTmpiM3FQUTFlQ2ZmNkFvVG95ckZnX29oZVlRdnNxaElDWG1YeTlzczR1UkhxR1RXcWhqdzdQdDQx?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 07 May · 22:20</div>
+      <div class="news-headline">Oil prices jump on renewed US-Iran hostilities - Reuters</div>
+      <div class="news-summary">Oil prices jump on renewed US-Iran hostilities  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMiugFBVV95cUxPOE1uOURBaC03bzROOEdzRzdQOGFvc1hOanMxM2w2NS0wOFc2ei1Ga1JDMHBTd0QtVzh4ZGdXSE16TFhkM1lXTWRZXzZ3bDM1SFo3Y1JfXzRoV09fQmJZSUZmOHNpWVptcjBKanJxM21GUS1Ncjc2Qm1rOTFkTk9yck9XWWRfZVk2QWNrdHZNWGIxUEkwX29aMDZ5em5ZaHZfcWlTQ2tncGh5WXFRT2Q0NnhyOXJZU3dYOWc?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 07 May · 22:07</div>
+      <div class="news-headline">US military says it carries out retaliatory strikes against Iran - Reuters</div>
+      <div class="news-summary">US military says it carries out retaliatory strikes against Iran  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxPRFFjYzMybXlET01QRW9uRjY5Z0tyQndJNXdvVHFoUWRmMHNJelJXdUZVV3pKRzlZd0RnRmhGdlFPb1dZZmtvQTkxYWpNMHRfTi1hcXdsSDB3b2Q3dTkxQmVrNVd1TUVYTjVkajdnNTk5QlN5WFdESkdMUEJXNjNwY21aWEw1eG51aW5nenhsUFk2UGRSdVZwYTF2QWVVcnE1RGxlcks1c0dJQQ?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 07 May · 22:03</div>
+      <div class="news-headline">Iran accuses US of violating ceasefire with new attacks - Reuters</div>
+      <div class="news-summary">Iran accuses US of violating ceasefire with new attacks  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMivwFBVV95cUxOcnplWTR4X2ZCYk1JNWVNTEkzbXM3WWlEX1BVWW1oREU4UjRCQXp0bU0zSzNZUF91SkZzeWFnQ2RTR0xVck1xTGlwX2JpX0JpVm9QOXVOWTRZdzRUMVZLTTlRUGFCaHBYaHZidUFNWVowc2VacjF6eUwwWTFBeF9tRXJidVQzQ1N3RFdqR2RIejhOcVpxXzNlQ0JOeGdoVkhEZERBMUN1aTRmWkdaN09sSkVKR1M5MGNXZUM0X0Y4TQ?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 07 May · 21:32</div>
+      <div class="news-headline">US navy came under missile fire after US attack on Iranian oil tanker, Iran state media says - Reuters</div>
+      <div class="news-summary">US navy came under missile fire after US attack on Iranian oil tanker, Iran state media says  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMiuwFBVV95cUxPdlktdk1TSHNxMnpibXJ6ZHR5OE5WMUNoSk5uQ1V1emRjZUppOThfM3J1YTNKMHBjMFNtcW9WREw4ZW5ELXRSUk5GRGpWZFZ5QlhHRFEwRE1PdjVKR3ZBdW02SzFrQ0ZtRV91X2NFZVpzX0JMZmVvV0s2bXZTeVFWNzlUMklCM0w0WnNKMUVlUEVrTVNqRWxtU1o3NElvNlJJeHR6VHZhRmZiRVJpaVB6bDVpV3FEZjBacmVj?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 07 May · 21:28</div>
+      <div class="news-headline">US targets Iraq oil official and militias with sanctions for aiding Iran - Reuters</div>
+      <div class="news-summary">US targets Iraq oil official and militias with sanctions for aiding Iran  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxOMTZwUEpxOWVFbWliMVZyLS1LNkx2bEV6cFRVUzRfN3pxY1Y5S0dhd3kwR0VtOTl2MVdhUEduLVc4Wm9HR0ZBbDNGYklrNEU0dlJyalBaZmpLU3FHc1RsTEdmclJUZXpRNC1vcU1WY1M3Q012Y1o3N096VlNwWTlaaC1qdGdLMFpnbDA2SmI4a2VIcjlYaW56cHVwYnRCcG5EUGxLMFpOZ0drZkVSczR1RUlPVThBY3RzRGEzbWNFMVF4RXhV?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 07 May · 21:11</div>
+      <div class="news-headline">US military strikes Iran’s Qeshm port and Bandar Abbas, Fox News reporter says - Reuters</div>
+      <div class="news-summary">US military strikes Iran’s Qeshm port and Bandar Abbas, Fox News reporter says  Reuters</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMisAFBVV95cUxOb2xLRlZudF9PNnJLel9xSmtuT3Rma2hmV0U2cmZqN1JrajNzNElCMmRzOGJGVWpWZTFGZUFuSzVyd0t4LVhod3FxdUNoNGV6bDg4UTFHbDUtbWlGZnNTWlNsTU94aDBPd1JtUm5pazZzdUZpVVZIT2VlcDB0MTluNlNSdUtxTWZ6eFV5UWtMTjltVUhQWjM2NHVqdzJ5XzhrWXc4NkhDQjBvbHdhYTA1eg?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 07 May · 20:36</div>
+      <div class="news-headline">US-proposed Iran resolution at UN faces likely vetoes from China, Russia - Reuters</div>
+      <div class="news-summary">US-proposed Iran resolution at UN faces likely vetoes from China, Russia  Reuters</div>
+    </a>
+    <a href="https://www.cnbc.com/2026/05/07/ai-winners-software-datadog-stock.html" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">CNBC · 07 May · 20:28</div>
+      <div class="news-headline">Datadog stock soars 31% on blockbuster earnings as AI winners emerge in software</div>
+      <div class="news-summary">Datadog's results fueled shares of other cloud infrastructure names like Snowflake and MongoDB.</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMitwFBVV95cUxNdmtGQjBLakhyaEF5QmdfVFZMaHpPa1Y0UXFGY2dQWjFfakVaWGw1dzZaWkVhV2k1ekF6cFAxbjVSSF8xSDl0XzRSYnY5Z0trbldEOHcxUVJwR05OaW4zVU1SOVBublVYX3JOS2ViMkZRdWJScFg1X3lYSUx2T0lKdkdfRjdLNXdOWkdVVDJ2Zkt6VGJmTVAtS1dZTVlZS1oyUFFOWTJPUnB1cFJZUVJMSFJOUFFvOWc?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 07 May · 20:17</div>
+      <div class="news-headline">Energy markets headed into 'troubled waters' amid Iran war, head of IEA says - Reuters</div>
+      <div class="news-summary">Energy markets headed into 'troubled waters' amid Iran war, head of IEA says  Reuters</div>
+    </a>
+    <a href="https://www.cnbc.com/2026/05/07/trump-iran-war-peace-hormuz-strait.html" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">CNBC · 07 May · 19:41</div>
+      <div class="news-headline">Iran still reviewing new U.S. peace proposal as Trump predicts war will 'be over quickly': Reports</div>
+      <div class="news-summary">Senior Iranian official Mohsen Rezaee reportedly said Tehran would not let the U.S. reopen the Strait of Hormuz with "an unrealistic plan."</div>
+    </a>
+    <a href="https://news.google.com/rss/articles/CBMixwFBVV95cUxPZFRlZXAzcjhrRklnR3MtZnV5YlF1T1hySm5MMVpMc2VKYU9maUVMNk5GaWxEM3VOYzZfaEx6d3NaOS1sODNadWZoSjlOcWpkREJMeXNicnVENUlXQklfa0ZpWDBEQ2tyTm5xS3JidEg0MUpyX1BUcldQSUpVUmdnUC1qMVR0Y3F1Y1JaTXZLUk1jVG5kQ0tCaHpDd2VBZUdKSHFTTkFqOWpyd21UWTZObGtKcC1TdTZGdktLZGhhTjlYb3ppYkNr?oc=5" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">Reuters · 07 May · 18:54</div>
+      <div class="news-headline">Iran's Fars news agency says sounds of explosions heard near Bandar Abbas city - Reuters</div>
+      <div class="news-summary">Iran's Fars news agency says sounds of explosions heard near Bandar Abbas city  Reuters</div>
+    </a>
+    <a href="https://www.cnbc.com/2026/05/07/software-stocks-stage-a-comeback-plus-why-boeings-ceo-going-to-china-matters-.html" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">CNBC · 07 May · 18:46</div>
+      <div class="news-headline">Software stocks stage a comeback. Plus, why Boeing's CEO going to China matters</div>
+      <div class="news-summary">Every weekday, the Investing Club releases the Homestretch; an actionable afternoon update just in time for the last hour of trading.</div>
+    </a>
+    <a href="https://www.cnbc.com/2026/05/07/mcd-earnings-mcdonalds-expands-in-china.html" target="_blank" rel="noopener" class="news-card">
+      <div class="news-meta">CNBC · 07 May · 18:37</div>
+      <div class="news-headline">While many international brands retreat, McDonald’s is supersizing its China business</div>
+      <div class="news-summary">McDonald's plans to have 10,000 locations in China by the end of 2028, and the country is its second largest market.</div>
+    </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  Data: Finnhub · Yahoo Finance &nbsp;·&nbsp;
+  Generated 08 May 2026 · 07:14 &nbsp;·&nbsp;
+  For personal research only — not financial advice
+</footer>
+
+</body>
+</html>
