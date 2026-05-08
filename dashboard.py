@@ -99,7 +99,7 @@ prices = {}
 if YF_OK:
     try:
         raw = yf.download(
-            all_tickers, period="5d", interval="1d",
+            all_tickers, period="1mo", interval="1d",
             progress=False, group_by="ticker",
             auto_adjust=True, threads=True
         )
@@ -178,24 +178,29 @@ except Exception as e:
 # ═════════════════════════════════════════════════════════════════════════════
 print("STEP 3 — COT data")
 
+# Full CFTC market names (from search_cot_markets)
 COT_DEFS = [
-    ("S&P 500 E-mini", "ES"),
-    ("Gold",           "GC"),
-    ("Crude Oil",      "CL"),
-    ("EUR/USD",        "6E"),
-    ("10Y T-Note",     "ZN"),
-    ("USD Index",      "DX"),
-    ("Bitcoin",        "BTC"),
+    ("S&P 500",    "S&P 500 Consolidated - CHICAGO MERCANTILE EXCHANGE"),
+    ("Nasdaq 100", "NASDAQ-100 Consolidated - CHICAGO MERCANTILE EXCHANGE"),
+    ("Gold",       "GOLD - COMMODITY EXCHANGE INC."),
+    ("WTI Crude",  "CRUDE OIL, LIGHT SWEET-WTI - ICE FUTURES EUROPE"),
+    ("EUR/USD",    "EURO FX - CHICAGO MERCANTILE EXCHANGE"),
+    ("10Y T-Note", "10-YEAR U.S. TREASURY NOTES - CHICAGO BOARD OF TRADE"),
+    ("USD Index",  "USD INDEX - ICE FUTURES U.S."),
 ]
 
+from urllib.parse import quote
+
 cot_data = []
-for label, sym in COT_DEFS:
+for label, market in COT_DEFS:
     try:
         url = (f"https://finnhub.io/api/v1/cot/legacy"
-               f"?symbol={sym}&from={COT_FROM}&to={TODAY}&token={FINNHUB_API_KEY}")
-        r = requests.get(url, timeout=8)
+               f"?symbol={quote(market)}&from={COT_FROM}&to={TODAY}&token={FINNHUB_API_KEY}")
+        r = requests.get(url, timeout=10)
+        if not r.text.strip():
+            print(f"  ⚠ COT {label}: empty response")
+            continue
         d = r.json()
-        # Finnhub returns a list directly
         entries = d if isinstance(d, list) else d.get("data", [])
         if not entries:
             continue
@@ -214,9 +219,9 @@ for label, sym in COT_DEFS:
             "short_nc": sht_nc,
             "date":     rdate,
         })
-        time.sleep(0.2)
+        time.sleep(0.3)
     except Exception as e:
-        print(f"  ⚠ COT {sym}: {e}")
+        print(f"  ⚠ COT {label}: {e}")
 
 print(f"  ✓ {len(cot_data)} symbols")
 
@@ -226,7 +231,10 @@ print(f"  ✓ {len(cot_data)} symbols")
 print("STEP 4 — Economic calendar")
 econ_events = []
 try:
-    cal = fh.economic_calendar(_from=TODAY, to=NEXT_2W)
+    cal_url = (f"https://finnhub.io/api/v1/economic_calendar"
+               f"?from={TODAY}&to={NEXT_2W}&token={FINNHUB_API_KEY}")
+    cal_r = requests.get(cal_url, timeout=10)
+    cal   = cal_r.json() if cal_r.text.strip() else {}
     if cal and "economicCalendar" in cal:
         for e in cal["economicCalendar"]:
             if e.get("impact") in ("high", "medium"):
