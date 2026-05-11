@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pattern Scanner (Tight) — 2026-05-11</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Instrument+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f5f2eb; --paper2:#ede9e0; --paper3:#e4dfd3;
+    --ink:#0a0a0a;   --ink2:#3a3a3a;  --ink3:#7a7a7a;
+    --accent:#c8410a; --green:#1a6b3a; --red:#b52525;
+    --gold:#b07d2a;  --border:rgba(10,10,10,0.12);
+    --mode:#1a6b3a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:"Instrument Sans",sans-serif;font-size:14px;line-height:1.5}
+
+  .mast{
+    position:sticky;top:0;z-index:100;background:var(--paper);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 32px;gap:16px;
+  }
+  .mast-left{display:flex;gap:8px;align-items:center;flex-shrink:0}
+  .pill{font-family:"DM Mono",monospace;font-size:11px;padding:3px 10px;border-radius:20px;background:var(--paper3);color:var(--ink2)}
+  .pill-mode{color:#fff;background:var(--mode)}
+  .mast-title{font-family:"DM Serif Display",serif;font-size:22px;white-space:nowrap}
+  .mast-right{display:flex;gap:10px;align-items:center;flex-shrink:0}
+  .nav-link{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);padding:4px 10px;border:1px solid var(--border);border-radius:4px;white-space:nowrap}
+  .nav-link:hover{background:var(--paper2)}
+  .ts{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3)}
+
+  .wrap{max-width:1400px;margin:0 auto;padding:28px 32px}
+
+  /* Explainer */
+  .explainer{
+    background:var(--paper2);border:1px solid var(--border);border-radius:8px;
+    padding:18px 24px;margin-bottom:20px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+  }
+  .step-n{font-family:"DM Mono",monospace;font-size:11px;color:var(--accent);margin-bottom:3px}
+  .step-title{font-weight:500;font-size:13px;margin-bottom:2px}
+  .step-desc{font-size:12px;color:var(--ink3);line-height:1.4}
+
+  /* Criteria bar */
+  .criteria{
+    font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);
+    padding:8px 16px;background:var(--paper3);border-radius:6px;
+    margin-bottom:20px;border-left:3px solid var(--mode);
+  }
+  .criteria b{color:var(--ink);font-weight:500}
+
+  /* Stats */
+  .stats{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+  .stat{background:var(--paper2);border:1px solid var(--border);border-radius:6px;padding:10px 18px;min-width:100px}
+  .stat-n{font-family:"DM Mono",monospace;font-size:20px;font-weight:500}
+  .stat-label{font-size:11px;color:var(--ink3);margin-top:1px}
+
+  /* Table */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px}
+  table{width:100%;border-collapse:collapse}
+  thead th{
+    background:var(--paper3);padding:9px 14px;
+    font-size:11px;font-weight:500;color:var(--ink3);
+    text-align:left;white-space:nowrap;
+    border-bottom:1px solid var(--border);
+  }
+  tbody tr:hover{background:var(--paper2)}
+  tbody td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
+  tbody tr:last-child td{border-bottom:none}
+  .sym{font-weight:600;font-size:14px;letter-spacing:0.02em}
+  .mono{font-family:"DM Mono",monospace;font-size:12px}
+  .muted{color:var(--ink3)}
+  .small{font-size:10px;color:var(--ink3)}
+  .empty{text-align:center;padding:40px;color:var(--ink3)}
+
+  /* Score bar */
+  .bar-bg{background:var(--paper3);border-radius:3px;height:5px;width:72px;margin-bottom:3px}
+  .bar-fill{background:var(--mode);border-radius:3px;height:5px}
+
+  footer{
+    text-align:center;padding:28px;
+    font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);
+    border-top:1px solid var(--border);margin-top:32px
+  }
+
+  @media(max-width:768px){
+    .mast{padding:10px 16px}
+    .wrap{padding:16px}
+    .explainer{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="mast">
+  <div class="mast-left">
+    <span class="pill">Scanner</span>
+    <span class="pill pill-mode">Tight</span>
+  </div>
+  <span class="mast-title">Breakout + Retest</span>
+  <div class="mast-right">
+    <a href="dashboard.html" class="nav-link">← Dashboard</a>
+    <a href="scanner-loose.html" class="nav-link">Loose Scanner →</a>
+    <span class="ts">2026-05-11</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="explainer">
+    <div>
+      <div class="step-n">PHASE 1</div>
+      <div class="step-title">Consolidation</div>
+      <div class="step-desc">Price compresses into a tight range for 20–60 days — coiling energy before a move</div>
+    </div>
+    <div>
+      <div class="step-n">PHASE 2</div>
+      <div class="step-title">Breakout</div>
+      <div class="step-desc">Closes above zone top by &gt;2% — demand overwhelms supply, new trend begins</div>
+    </div>
+    <div>
+      <div class="step-n">PHASE 3</div>
+      <div class="step-title">Throwback</div>
+      <div class="step-desc">Pulls back from peak, giving back ≥40% of the run — weak hands shaken out</div>
+    </div>
+    <div>
+      <div class="step-n">PHASE 4 ★</div>
+      <div class="step-title">Retest as Support</div>
+      <div class="step-desc">Former resistance holds as support — within ±2% of zone top is the buy zone</div>
+    </div>
+  </div>
+
+  <div class="criteria">
+    <b>Filter criteria (Tight):</b> &nbsp; Zone range ≤ 12%  ·  Proximity ±2% of support  ·  Retreat ≥ 40% of breakout run  ·  Score ≥ 0.75
+    &nbsp;·&nbsp; <b>High-conviction only — very tight base, right at support</b>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-n" style="color:var(--mode)">4</div><div class="stat-label">Matches</div></div>
+    <div class="stat"><div class="stat-n">99</div><div class="stat-label">Stocks scanned</div></div>
+    <div class="stat"><div class="stat-n">0</div><div class="stat-label">No data</div></div>
+    <div class="stat"><div class="stat-n">4.0%</div><div class="stat-label">Hit rate</div></div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Price</th>
+          <th>Support</th>
+          <th>Proximity</th>
+          <th>Breakout</th>
+          <th>Peak</th>
+          <th>Retreat</th>
+          <th>Base Range</th>
+          <th>Base Period</th>
+          <th>Since Breakout</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="sym">COST</td>
+          <td class="mono">$1,008.79</td>
+          <td class="mono">$1,008.43</td>
+          <td class="mono" style="color:#1a6b3a">+0.0% above</td>
+          <td class="mono">$1,030.27</td>
+          <td class="mono">$1,032.03</td>
+          <td class="mono">98%</td>
+          <td class="mono">4.4%</td>
+          <td class="mono muted">Mar 05–Apr 01</td>
+          <td class="mono">22d ago</td>
+          <td>
+            <div class="bar-bg"><div class="bar-fill" style="width:84%"></div></div>
+            <span class="mono small">0.843</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="sym">NEE</td>
+          <td class="mono">$93.10</td>
+          <td class="mono">$92.88</td>
+          <td class="mono" style="color:#1a6b3a">+0.2% above</td>
+          <td class="mono">$96.25</td>
+          <td class="mono">$97.88</td>
+          <td class="mono">96%</td>
+          <td class="mono">3.8%</td>
+          <td class="mono muted">Mar 05–Apr 01</td>
+          <td class="mono">11d ago</td>
+          <td>
+            <div class="bar-bg"><div class="bar-fill" style="width:82%"></div></div>
+            <span class="mono small">0.829</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="sym">UPS</td>
+          <td class="mono">$100.78</td>
+          <td class="mono">$100.92</td>
+          <td class="mono" style="color:#1a6b3a">-0.1% below</td>
+          <td class="mono">$103.22</td>
+          <td class="mono">$108.80</td>
+          <td class="mono">102%</td>
+          <td class="mono">6.5%</td>
+          <td class="mono muted">Mar 10–Apr 07</td>
+          <td class="mono">18d ago</td>
+          <td>
+            <div class="bar-bg"><div class="bar-fill" style="width:78%"></div></div>
+            <span class="mono small">0.782</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="sym">MO</td>
+          <td class="mono">$68.12</td>
+          <td class="mono">$67.89</td>
+          <td class="mono" style="color:#1a6b3a">+0.3% above</td>
+          <td class="mono">$72.65</td>
+          <td class="mono">$74.55</td>
+          <td class="mono">96%</td>
+          <td class="mono">6.4%</td>
+          <td class="mono muted">Mar 10–Apr 21</td>
+          <td class="mono">6d ago</td>
+          <td>
+            <div class="bar-bg"><div class="bar-fill" style="width:76%"></div></div>
+            <span class="mono small">0.768</span>
+          </td>
+        </tr></tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  Breakout + Retest Scanner (Tight) &nbsp;·&nbsp;
+  Data: Finnhub &nbsp;·&nbsp;
+  Universe: 99 stocks &nbsp;·&nbsp;
+  Generated 2026-05-11 16:16 UTC &nbsp;·&nbsp;
+  Personal research only — not investment advice
+</footer>
+</body>
+</html>
