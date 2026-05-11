@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pattern Scanner — 2026-05-11</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Instrument+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f5f2eb; --paper2:#ede9e0; --paper3:#e4dfd3;
+    --ink:#0a0a0a;   --ink2:#3a3a3a;  --ink3:#7a7a7a;
+    --accent:#c8410a; --green:#1a6b3a; --red:#b52525;
+    --gold:#b07d2a;  --border:rgba(10,10,10,0.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:"Instrument Sans",sans-serif;font-size:14px}
+  a{color:inherit;text-decoration:none}
+
+  /* ── Masthead ── */
+  .mast{
+    position:sticky;top:0;z-index:100;
+    background:var(--paper);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 32px;
+  }
+  .mast-left{display:flex;gap:8px;align-items:center}
+  .pill{font-family:"DM Mono",monospace;font-size:11px;padding:3px 10px;border-radius:20px;background:var(--paper3);color:var(--ink2)}
+  .pill-accent{background:var(--accent);color:#fff}
+  .mast-title{font-family:"DM Serif Display",serif;font-size:22px}
+  .mast-right{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3)}
+
+  /* ── Main ── */
+  .wrap{max-width:1400px;margin:0 auto;padding:32px}
+
+  /* ── Explainer ── */
+  .explainer{
+    background:var(--paper2);border:1px solid var(--border);border-radius:8px;
+    padding:20px 24px;margin-bottom:28px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+  }
+  .step{}
+  .step-n{font-family:"DM Mono",monospace;font-size:11px;color:var(--accent);font-weight:500;margin-bottom:4px}
+  .step-title{font-weight:500;margin-bottom:2px}
+  .step-desc{font-size:12px;color:var(--ink3);line-height:1.4}
+
+  /* ── Stats bar ── */
+  .stats{display:flex;gap:24px;margin-bottom:24px;flex-wrap:wrap}
+  .stat{background:var(--paper2);border:1px solid var(--border);border-radius:6px;padding:12px 20px}
+  .stat-n{font-family:"DM Mono",monospace;font-size:22px;font-weight:500}
+  .stat-label{font-size:11px;color:var(--ink3);margin-top:2px}
+
+  /* ── Table ── */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px}
+  table{width:100%;border-collapse:collapse;}
+  thead th{
+    background:var(--paper3);padding:10px 14px;
+    font-size:11px;font-weight:500;color:var(--ink3);
+    text-align:left;white-space:nowrap;
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;
+  }
+  tbody tr:hover{background:var(--paper2)}
+  tbody td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
+  tbody tr:last-child td{border-bottom:none}
+  .sym{font-weight:500;font-size:14px}
+  .mono{font-family:"DM Mono",monospace;font-size:12px}
+  .muted{color:var(--ink3)}
+  .small{font-size:10px;color:var(--ink3)}
+
+  /* ── Score bar ── */
+  .bar-bg{background:var(--paper3);border-radius:3px;height:6px;width:80px;margin-bottom:3px}
+  .bar-fill{background:var(--accent);border-radius:3px;height:6px}
+
+  /* ── Footer ── */
+  footer{text-align:center;padding:32px;font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);border-top:1px solid var(--border);margin-top:40px}
+
+  /* ── No matches ── */
+  .no-match{
+    background:var(--paper2);border:1px solid var(--border);border-radius:8px;
+    padding:48px;text-align:center;color:var(--ink3);
+  }
+
+  /* ── Dashboard link ── */
+  .nav-link{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);padding:4px 10px;border:1px solid var(--border);border-radius:4px}
+  .nav-link:hover{background:var(--paper2)}
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div class="mast">
+  <div class="mast-left">
+    <span class="pill">Scanner · v1</span>
+    <span class="pill pill-accent">Breakout + Retest</span>
+  </div>
+  <span class="mast-title">Pattern Scanner</span>
+  <div style="display:flex;gap:12px;align-items:center">
+    <a href="dashboard.html" class="nav-link">← Dashboard</a>
+    <span class="mast-right">2026-05-11</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- PATTERN EXPLAINER -->
+  <div class="explainer">
+    <div class="step">
+      <div class="step-n">PHASE 1</div>
+      <div class="step-title">Consolidation</div>
+      <div class="step-desc">Price compresses into a tight range (&lt;20%) for 20–60 trading days — energy building</div>
+    </div>
+    <div class="step">
+      <div class="step-n">PHASE 2</div>
+      <div class="step-title">Breakout</div>
+      <div class="step-desc">Price breaks above the zone top (&gt;2%) — demand overwhelms supply, trend change confirmed</div>
+    </div>
+    <div class="step">
+      <div class="step-n">PHASE 3</div>
+      <div class="step-title">Throwback</div>
+      <div class="step-desc">Price pulls back ≥30% of the breakout run — shaking out weak hands, retesting the level</div>
+    </div>
+    <div class="step">
+      <div class="step-n">PHASE 4 ★</div>
+      <div class="step-title">Retest as Support</div>
+      <div class="step-desc">Former resistance now holds as support — within ±5% of zone top is the actionable buy zone</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-n">65</div>
+      <div class="stat-label">Pattern matches</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">99</div>
+      <div class="stat-label">Stocks scanned</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">0</div>
+      <div class="stat-label">No data</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">65.7%</div>
+      <div class="stat-label">Hit rate</div>
+    </div>
+  </div>
+
+  <!-- RESULTS TABLE -->
+  
+  <div class="tbl-wrap"><table><thead><tr><th>Symbol</th><th>Price</th><th>Support Level</th><th>Proximity to Support</th><th>Breakout Price</th><th>Peak Price</th><th>Retreat</th><th>Zone Range</th><th>Zone Period</th><th>Days Since BO</th><th>Score</th></tr></thead><tbody>
+    <tr>
+      <td class="sym">NEE</td>
+      <td class="mono">$93.10</td>
+      <td class="mono">$92.88</td>
+      <td class="mono" style="color:#1a6b3a">+0.2% above support</td>
+      <td class="mono">$96.25</td>
+      <td class="mono">$97.88</td>
+      <td class="mono">96%</td>
+      <td class="mono">3.8%</td>
+      <td class="mono muted">Mar 05–Apr 01</td>
+      <td class="mono">11d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:89%"></div></div>
+        <span class="mono small">0.896</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">COST</td>
+      <td class="mono">$1,008.79</td>
+      <td class="mono">$1,008.43</td>
+      <td class="mono" style="color:#1a6b3a">+0.0% above support</td>
+      <td class="mono">$1,030.27</td>
+      <td class="mono">$1,032.03</td>
+      <td class="mono">98%</td>
+      <td class="mono">4.4%</td>
+      <td class="mono muted">Mar 05–Apr 01</td>
+      <td class="mono">22d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:89%"></div></div>
+        <span class="mono small">0.892</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">MO</td>
+      <td class="mono">$68.12</td>
+      <td class="mono">$67.46</td>
+      <td class="mono" style="color:#1a6b3a">+1.0% above support</td>
+      <td class="mono">$72.65</td>
+      <td class="mono">$74.55</td>
+      <td class="mono">91%</td>
+      <td class="mono">5.1%</td>
+      <td class="mono muted">Mar 26–Apr 23</td>
+      <td class="mono">6d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:87%"></div></div>
+        <span class="mono small">0.877</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">UPS</td>
+      <td class="mono">$100.78</td>
+      <td class="mono">$100.92</td>
+      <td class="mono" style="color:#1a6b3a">-0.1% below support</td>
+      <td class="mono">$103.22</td>
+      <td class="mono">$108.80</td>
+      <td class="mono">102%</td>
+      <td class="mono">6.5%</td>
+      <td class="mono muted">Mar 10–Apr 07</td>
+      <td class="mono">18d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:86%"></div></div>
+        <span class="mono small">0.863</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">V</td>
+      <td class="mono">$318.79</td>
+      <td class="mono">$317.02</td>
+      <td class="mono" style="color:#1a6b3a">+0.6% above support</td>
+      <td class="mono">$334.86</td>
+      <td class="mono">$334.86</td>
+      <td class="mono">90%</td>
+      <td class="mono">7.3%</td>
+      <td class="mono muted">Mar 26–Apr 23</td>
+      <td class="mono">7d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:85%"></div></div>
+        <span class="mono small">0.857</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">LIN</td>
+      <td class="mono">$493.16</td>
+      <td class="mono">$499.26</td>
+      <td class="mono" style="color:#1a6b3a">-1.2% below support</td>
+      <td class="mono">$510.30</td>
+      <td class="mono">$510.75</td>
+      <td class="mono">153%</td>
+      <td class="mono">4.5%</td>
+      <td class="mono muted">Mar 05–Apr 01</td>
+      <td class="mono">10d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:85%"></div></div>
+        <span class="mono small">0.856</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">JPM</td>
+      <td class="mono">$302.10</td>
+      <td class="mono">$300.26</td>
+      <td class="mono" style="color:#1a6b3a">+0.6% above support</td>
+      <td class="mono">$307.97</td>
+      <td class="mono">$316.99</td>
+      <td class="mono">89%</td>
+      <td class="mono">6.2%</td>
+      <td class="mono muted">Mar 02–Mar 27</td>
+      <td class="mono">22d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:84%"></div></div>
+        <span class="mono small">0.844</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">WMT</td>
+      <td class="mono">$130.43</td>
+      <td class="mono">$129.13</td>
+      <td class="mono" style="color:#1a6b3a">+1.0% above support</td>
+      <td class="mono">$132.03</td>
+      <td class="mono">$132.03</td>
+      <td class="mono">55%</td>
+      <td class="mono">7.0%</td>
+      <td class="mono muted">Mar 23–Apr 20</td>
+      <td class="mono">11d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:84%"></div></div>
+        <span class="mono small">0.843</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">SLB</td>
+      <td class="mono">$53.27</td>
+      <td class="mono">$53.50</td>
+      <td class="mono" style="color:#1a6b3a">-0.4% below support</td>
+      <td class="mono">$54.74</td>
+      <td class="mono">$56.92</td>
+      <td class="mono">107%</td>
+      <td class="mono">8.6%</td>
+      <td class="mono muted">Mar 23–Apr 20</td>
+      <td class="mono">11d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:83%"></div></div>
+        <span class="mono small">0.836</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">PYPL</td>
+      <td class="mono">$45.37</td>
+      <td class="mono">$46.13</td>
+      <td class="mono" style="color:#1a6b3a">-1.6% below support</td>
+      <td class="mono">$47.51</td>
+      <td class="mono">$51.46</td>
+      <td class="mono">114%</td>
+      <td class="mono">5.8%</td>
+      <td class="mono muted">Mar 13–Apr 10</td>
+      <td class="mono">19d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:83%"></div></div>
+        <span class="mono small">0.832</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">LLY</td>
+      <td class="mono">$948.45</td>
+      <td class="mono">$955.19</td>
+      <td class="mono" style="color:#1a6b3a">-0.7% below support</td>
+      <td class="mono">$988.87</td>
+      <td class="mono">$988.87</td>
+      <td class="mono">120%</td>
+      <td class="mono">8.8%</td>
+      <td class="mono muted">Mar 26–Apr 23</td>
+      <td class="mono">3d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:83%"></div></div>
+        <span class="mono small">0.830</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">PNC</td>
+      <td class="mono">$216.85</td>
+      <td class="mono">$213.92</td>
+      <td class="mono" style="color:#1a6b3a">+1.4% above support</td>
+      <td class="mono">$220.76</td>
+      <td class="mono">$228.05</td>
+      <td class="mono">79%</td>
+      <td class="mono">6.6%</td>
+      <td class="mono muted">Mar 10–Apr 07</td>
+      <td class="mono">22d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:82%"></div></div>
+        <span class="mono small">0.825</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">AXP</td>
+      <td class="mono">$316.03</td>
+      <td class="mono">$317.77</td>
+      <td class="mono" style="color:#1a6b3a">-0.5% below support</td>
+      <td class="mono">$326.96</td>
+      <td class="mono">$332.90</td>
+      <td class="mono">112%</td>
+      <td class="mono">8.7%</td>
+      <td class="mono muted">Mar 13–Apr 10</td>
+      <td class="mono">18d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:82%"></div></div>
+        <span class="mono small">0.821</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">MRK</td>
+      <td class="mono">$111.38</td>
+      <td class="mono">$111.11</td>
+      <td class="mono" style="color:#1a6b3a">+0.2% above support</td>
+      <td class="mono">$113.37</td>
+      <td class="mono">$123.93</td>
+      <td class="mono">98%</td>
+      <td class="mono">4.4%</td>
+      <td class="mono muted">Jan 02–Jan 30</td>
+      <td class="mono">67d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:82%"></div></div>
+        <span class="mono small">0.821</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">MSFT</td>
+      <td class="mono">$415.12</td>
+      <td class="mono">$414.19</td>
+      <td class="mono" style="color:#1a6b3a">+0.2% above support</td>
+      <td class="mono">$422.79</td>
+      <td class="mono">$432.92</td>
+      <td class="mono">95%</td>
+      <td class="mono">7.7%</td>
+      <td class="mono muted">Feb 03–Mar 17</td>
+      <td class="mono">15d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:81%"></div></div>
+        <span class="mono small">0.819</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">COF</td>
+      <td class="mono">$189.48</td>
+      <td class="mono">$185.23</td>
+      <td class="mono" style="color:#b07d2a">+2.3% above support</td>
+      <td class="mono">$192.46</td>
+      <td class="mono">$206.47</td>
+      <td class="mono">80%</td>
+      <td class="mono">5.2%</td>
+      <td class="mono muted">Mar 10–Apr 07</td>
+      <td class="mono">22d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:81%"></div></div>
+        <span class="mono small">0.817</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">MA</td>
+      <td class="mono">$495.48</td>
+      <td class="mono">$508.50</td>
+      <td class="mono" style="color:#b07d2a">-2.6% below support</td>
+      <td class="mono">$519.96</td>
+      <td class="mono">$525.23</td>
+      <td class="mono">178%</td>
+      <td class="mono">5.0%</td>
+      <td class="mono muted">Mar 13–Apr 10</td>
+      <td class="mono">17d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:81%"></div></div>
+        <span class="mono small">0.817</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">SPG</td>
+      <td class="mono">$202.12</td>
+      <td class="mono">$202.60</td>
+      <td class="mono" style="color:#1a6b3a">-0.2% below support</td>
+      <td class="mono">$207.56</td>
+      <td class="mono">$207.56</td>
+      <td class="mono">110%</td>
+      <td class="mono">7.0%</td>
+      <td class="mono muted">Jan 29–Feb 26</td>
+      <td class="mono">14d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:81%"></div></div>
+        <span class="mono small">0.810</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">FDX</td>
+      <td class="mono">$378.58</td>
+      <td class="mono">$377.00</td>
+      <td class="mono" style="color:#1a6b3a">+0.4% above support</td>
+      <td class="mono">$392.38</td>
+      <td class="mono">$403.31</td>
+      <td class="mono">94%</td>
+      <td class="mono">10.3%</td>
+      <td class="mono muted">Mar 18–Apr 15</td>
+      <td class="mono">15d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:80%"></div></div>
+        <span class="mono small">0.806</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">TGT</td>
+      <td class="mono">$125.25</td>
+      <td class="mono">$124.03</td>
+      <td class="mono" style="color:#1a6b3a">+1.0% above support</td>
+      <td class="mono">$127.84</td>
+      <td class="mono">$132.10</td>
+      <td class="mono">85%</td>
+      <td class="mono">9.5%</td>
+      <td class="mono muted">Mar 05–Apr 16</td>
+      <td class="mono">15d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:80%"></div></div>
+        <span class="mono small">0.803</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">PFE</td>
+      <td class="mono">$25.68</td>
+      <td class="mono">$25.89</td>
+      <td class="mono" style="color:#1a6b3a">-0.8% below support</td>
+      <td class="mono">$26.50</td>
+      <td class="mono">$28.55</td>
+      <td class="mono">108%</td>
+      <td class="mono">4.1%</td>
+      <td class="mono muted">Dec 18–Jan 16</td>
+      <td class="mono">71d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:79%"></div></div>
+        <span class="mono small">0.794</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">BAC</td>
+      <td class="mono">$51.31</td>
+      <td class="mono">$50.28</td>
+      <td class="mono" style="color:#b07d2a">+2.0% above support</td>
+      <td class="mono">$51.88</td>
+      <td class="mono">$54.32</td>
+      <td class="mono">74%</td>
+      <td class="mono">7.6%</td>
+      <td class="mono muted">Mar 10–Apr 07</td>
+      <td class="mono">22d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:78%"></div></div>
+        <span class="mono small">0.788</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">PG</td>
+      <td class="mono">$146.42</td>
+      <td class="mono">$146.35</td>
+      <td class="mono" style="color:#1a6b3a">+0.0% above support</td>
+      <td class="mono">$149.93</td>
+      <td class="mono">$167.20</td>
+      <td class="mono">100%</td>
+      <td class="mono">6.0%</td>
+      <td class="mono muted">Dec 18–Jan 16</td>
+      <td class="mono">74d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:78%"></div></div>
+        <span class="mono small">0.788</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">T</td>
+      <td class="mono">$25.16</td>
+      <td class="mono">$24.84</td>
+      <td class="mono" style="color:#1a6b3a">+1.3% above support</td>
+      <td class="mono">$26.21</td>
+      <td class="mono">$29.10</td>
+      <td class="mono">92%</td>
+      <td class="mono">3.6%</td>
+      <td class="mono muted">Dec 10–Jan 08</td>
+      <td class="mono">68d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:77%"></div></div>
+        <span class="mono small">0.777</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">ADBE</td>
+      <td class="mono">$253.04</td>
+      <td class="mono">$248.63</td>
+      <td class="mono" style="color:#1a6b3a">+1.8% above support</td>
+      <td class="mono">$255.94</td>
+      <td class="mono">$256.51</td>
+      <td class="mono">44%</td>
+      <td class="mono">10.3%</td>
+      <td class="mono muted">Mar 23–Apr 20</td>
+      <td class="mono">12d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:77%"></div></div>
+        <span class="mono small">0.770</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">PLD</td>
+      <td class="mono">$144.09</td>
+      <td class="mono">$142.17</td>
+      <td class="mono" style="color:#1a6b3a">+1.4% above support</td>
+      <td class="mono">$145.10</td>
+      <td class="mono">$145.10</td>
+      <td class="mono">34%</td>
+      <td class="mono">11.1%</td>
+      <td class="mono muted">Mar 05–Apr 16</td>
+      <td class="mono">15d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:76%"></div></div>
+        <span class="mono small">0.769</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">UBER</td>
+      <td class="mono">$75.45</td>
+      <td class="mono">$76.65</td>
+      <td class="mono" style="color:#1a6b3a">-1.6% below support</td>
+      <td class="mono">$79.17</td>
+      <td class="mono">$79.17</td>
+      <td class="mono">148%</td>
+      <td class="mono">8.7%</td>
+      <td class="mono muted">Feb 17–Mar 16</td>
+      <td class="mono">2d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:76%"></div></div>
+        <span class="mono small">0.764</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">DE</td>
+      <td class="mono">$574.84</td>
+      <td class="mono">$594.04</td>
+      <td class="mono" style="color:#b07d2a">-3.2% below support</td>
+      <td class="mono">$609.32</td>
+      <td class="mono">$618.00</td>
+      <td class="mono">180%</td>
+      <td class="mono">6.9%</td>
+      <td class="mono muted">Mar 10–Apr 07</td>
+      <td class="mono">22d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:76%"></div></div>
+        <span class="mono small">0.763</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">JNJ</td>
+      <td class="mono">$221.32</td>
+      <td class="mono">$220.14</td>
+      <td class="mono" style="color:#1a6b3a">+0.5% above support</td>
+      <td class="mono">$227.72</td>
+      <td class="mono">$248.56</td>
+      <td class="mono">96%</td>
+      <td class="mono">7.7%</td>
+      <td class="mono muted">Dec 10–Jan 23</td>
+      <td class="mono">70d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:75%"></div></div>
+        <span class="mono small">0.754</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">AMGN</td>
+      <td class="mono">$331.70</td>
+      <td class="mono">$333.96</td>
+      <td class="mono" style="color:#1a6b3a">-0.7% below support</td>
+      <td class="mono">$341.64</td>
+      <td class="mono">$388.16</td>
+      <td class="mono">104%</td>
+      <td class="mono">6.4%</td>
+      <td class="mono muted">Dec 05–Jan 05</td>
+      <td class="mono">84d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:74%"></div></div>
+        <span class="mono small">0.749</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">BMY</td>
+      <td class="mono">$56.16</td>
+      <td class="mono">$56.72</td>
+      <td class="mono" style="color:#1a6b3a">-1.0% below support</td>
+      <td class="mono">$59.52</td>
+      <td class="mono">$62.37</td>
+      <td class="mono">110%</td>
+      <td class="mono">6.9%</td>
+      <td class="mono muted">Dec 15–Jan 13</td>
+      <td class="mono">64d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:74%"></div></div>
+        <span class="mono small">0.742</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">RTX</td>
+      <td class="mono">$176.09</td>
+      <td class="mono">$177.42</td>
+      <td class="mono" style="color:#1a6b3a">-0.7% below support</td>
+      <td class="mono">$182.11</td>
+      <td class="mono">$212.16</td>
+      <td class="mono">104%</td>
+      <td class="mono">5.6%</td>
+      <td class="mono muted">Nov 13–Dec 11</td>
+      <td class="mono">99d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:73%"></div></div>
+        <span class="mono small">0.736</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">SBUX</td>
+      <td class="mono">$104.93</td>
+      <td class="mono">$101.44</td>
+      <td class="mono" style="color:#b07d2a">+3.4% above support</td>
+      <td class="mono">$105.50</td>
+      <td class="mono">$106.44</td>
+      <td class="mono">30%</td>
+      <td class="mono">7.0%</td>
+      <td class="mono muted">Feb 17–Mar 16</td>
+      <td class="mono">7d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:73%"></div></div>
+        <span class="mono small">0.732</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">CVX</td>
+      <td class="mono">$181.62</td>
+      <td class="mono">$185.82</td>
+      <td class="mono" style="color:#b07d2a">-2.3% below support</td>
+      <td class="mono">$189.60</td>
+      <td class="mono">$211.15</td>
+      <td class="mono">117%</td>
+      <td class="mono">8.5%</td>
+      <td class="mono muted">Jan 29–Feb 26</td>
+      <td class="mono">48d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:72%"></div></div>
+        <span class="mono small">0.726</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">PSX</td>
+      <td class="mono">$171.56</td>
+      <td class="mono">$169.50</td>
+      <td class="mono" style="color:#1a6b3a">+1.2% above support</td>
+      <td class="mono">$174.09</td>
+      <td class="mono">$188.28</td>
+      <td class="mono">89%</td>
+      <td class="mono">11.6%</td>
+      <td class="mono muted">Feb 11–Mar 11</td>
+      <td class="mono">40d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:72%"></div></div>
+        <span class="mono small">0.726</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">BLK</td>
+      <td class="mono">$1,084.83</td>
+      <td class="mono">$1,101.84</td>
+      <td class="mono" style="color:#1a6b3a">-1.5% below support</td>
+      <td class="mono">$1,156.65</td>
+      <td class="mono">$1,163.17</td>
+      <td class="mono">128%</td>
+      <td class="mono">6.1%</td>
+      <td class="mono muted">Dec 02–Dec 30</td>
+      <td class="mono">78d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:72%"></div></div>
+        <span class="mono small">0.723</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">HON</td>
+      <td class="mono">$213.12</td>
+      <td class="mono">$210.28</td>
+      <td class="mono" style="color:#1a6b3a">+1.4% above support</td>
+      <td class="mono">$215.02</td>
+      <td class="mono">$248.04</td>
+      <td class="mono">92%</td>
+      <td class="mono">7.8%</td>
+      <td class="mono muted">Dec 15–Jan 13</td>
+      <td class="mono">78d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:71%"></div></div>
+        <span class="mono small">0.718</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">GILD</td>
+      <td class="mono">$131.33</td>
+      <td class="mono">$131.14</td>
+      <td class="mono" style="color:#1a6b3a">+0.1% above support</td>
+      <td class="mono">$135.93</td>
+      <td class="mono">$155.80</td>
+      <td class="mono">99%</td>
+      <td class="mono">10.9%</td>
+      <td class="mono muted">Dec 23–Jan 22</td>
+      <td class="mono">73d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:71%"></div></div>
+        <span class="mono small">0.717</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">GE</td>
+      <td class="mono">$297.15</td>
+      <td class="mono">$300.98</td>
+      <td class="mono" style="color:#1a6b3a">-1.3% below support</td>
+      <td class="mono">$307.21</td>
+      <td class="mono">$345.74</td>
+      <td class="mono">109%</td>
+      <td class="mono">6.1%</td>
+      <td class="mono muted">Nov 18–Dec 16</td>
+      <td class="mono">95d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:71%"></div></div>
+        <span class="mono small">0.717</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">PEP</td>
+      <td class="mono">$154.62</td>
+      <td class="mono">$151.22</td>
+      <td class="mono" style="color:#b07d2a">+2.2% above support</td>
+      <td class="mono">$155.20</td>
+      <td class="mono">$170.49</td>
+      <td class="mono">82%</td>
+      <td class="mono">4.5%</td>
+      <td class="mono muted">Nov 21–Dec 19</td>
+      <td class="mono">67d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:71%"></div></div>
+        <span class="mono small">0.716</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">COP</td>
+      <td class="mono">$113.87</td>
+      <td class="mono">$111.59</td>
+      <td class="mono" style="color:#b07d2a">+2.0% above support</td>
+      <td class="mono">$118.24</td>
+      <td class="mono">$133.80</td>
+      <td class="mono">90%</td>
+      <td class="mono">9.6%</td>
+      <td class="mono muted">Jan 29–Feb 26</td>
+      <td class="mono">48d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:71%"></div></div>
+        <span class="mono small">0.716</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">KO</td>
+      <td class="mono">$78.42</td>
+      <td class="mono">$79.56</td>
+      <td class="mono" style="color:#1a6b3a">-1.4% below support</td>
+      <td class="mono">$81.56</td>
+      <td class="mono">$81.56</td>
+      <td class="mono">157%</td>
+      <td class="mono">10.7%</td>
+      <td class="mono muted">Jan 21–Feb 18</td>
+      <td class="mono">49d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:70%"></div></div>
+        <span class="mono small">0.709</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">AMT</td>
+      <td class="mono">$176.53</td>
+      <td class="mono">$180.26</td>
+      <td class="mono" style="color:#b07d2a">-2.1% below support</td>
+      <td class="mono">$188.19</td>
+      <td class="mono">$193.09</td>
+      <td class="mono">129%</td>
+      <td class="mono">7.0%</td>
+      <td class="mono muted">Dec 15–Jan 13</td>
+      <td class="mono">59d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:70%"></div></div>
+        <span class="mono small">0.708</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">EOG</td>
+      <td class="mono">$130.03</td>
+      <td class="mono">$132.51</td>
+      <td class="mono" style="color:#1a6b3a">-1.9% below support</td>
+      <td class="mono">$135.72</td>
+      <td class="mono">$149.89</td>
+      <td class="mono">114%</td>
+      <td class="mono">12.4%</td>
+      <td class="mono muted">Feb 11–Mar 11</td>
+      <td class="mono">37d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:69%"></div></div>
+        <span class="mono small">0.693</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">ISRG</td>
+      <td class="mono">$450.06</td>
+      <td class="mono">$452.35</td>
+      <td class="mono" style="color:#1a6b3a">-0.5% below support</td>
+      <td class="mono">$462.74</td>
+      <td class="mono">$592.85</td>
+      <td class="mono">102%</td>
+      <td class="mono">5.3%</td>
+      <td class="mono muted">Sep 19–Oct 16</td>
+      <td class="mono">137d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:68%"></div></div>
+        <span class="mono small">0.687</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">LMT</td>
+      <td class="mono">$506.51</td>
+      <td class="mono">$505.90</td>
+      <td class="mono" style="color:#1a6b3a">+0.1% above support</td>
+      <td class="mono">$522.04</td>
+      <td class="mono">$676.70</td>
+      <td class="mono">100%</td>
+      <td class="mono">7.9%</td>
+      <td class="mono muted">Oct 10–Nov 06</td>
+      <td class="mono">85d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:68%"></div></div>
+        <span class="mono small">0.683</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">PM</td>
+      <td class="mono">$170.99</td>
+      <td class="mono">$165.85</td>
+      <td class="mono" style="color:#b07d2a">+3.1% above support</td>
+      <td class="mono">$171.08</td>
+      <td class="mono">$189.80</td>
+      <td class="mono">78%</td>
+      <td class="mono">6.9%</td>
+      <td class="mono muted">Dec 15–Jan 13</td>
+      <td class="mono">79d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:67%"></div></div>
+        <span class="mono small">0.679</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">GS</td>
+      <td class="mono">$936.48</td>
+      <td class="mono">$955.47</td>
+      <td class="mono" style="color:#b07d2a">-2.0% below support</td>
+      <td class="mono">$975.86</td>
+      <td class="mono">$975.86</td>
+      <td class="mono">193%</td>
+      <td class="mono">9.5%</td>
+      <td class="mono muted">Dec 15–Jan 13</td>
+      <td class="mono">78d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:67%"></div></div>
+        <span class="mono small">0.672</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">CMCSA</td>
+      <td class="mono">$25.40</td>
+      <td class="mono">$26.20</td>
+      <td class="mono" style="color:#b07d2a">-3.1% below support</td>
+      <td class="mono">$27.85</td>
+      <td class="mono">$32.48</td>
+      <td class="mono">113%</td>
+      <td class="mono">5.7%</td>
+      <td class="mono muted">Oct 31–Dec 12</td>
+      <td class="mono">98d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:66%"></div></div>
+        <span class="mono small">0.666</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">NFLX</td>
+      <td class="mono">$87.49</td>
+      <td class="mono">$86.12</td>
+      <td class="mono" style="color:#1a6b3a">+1.6% above support</td>
+      <td class="mono">$96.24</td>
+      <td class="mono">$107.79</td>
+      <td class="mono">94%</td>
+      <td class="mono">13.5%</td>
+      <td class="mono muted">Jan 21–Feb 18</td>
+      <td class="mono">49d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:66%"></div></div>
+        <span class="mono small">0.662</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">BA</td>
+      <td class="mono">$237.36</td>
+      <td class="mono">$237.38</td>
+      <td class="mono" style="color:#1a6b3a">+-0.0% above support</td>
+      <td class="mono">$244.55</td>
+      <td class="mono">$252.15</td>
+      <td class="mono">100%</td>
+      <td class="mono">5.8%</td>
+      <td class="mono muted">Aug 12–Sep 09</td>
+      <td class="mono">80d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:65%"></div></div>
+        <span class="mono small">0.652</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">CDNS</td>
+      <td class="mono">$362.70</td>
+      <td class="mono">$361.77</td>
+      <td class="mono" style="color:#1a6b3a">+0.3% above support</td>
+      <td class="mono">$373.35</td>
+      <td class="mono">$373.37</td>
+      <td class="mono">92%</td>
+      <td class="mono">5.5%</td>
+      <td class="mono muted">Aug 12–Sep 09</td>
+      <td class="mono">159d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:64%"></div></div>
+        <span class="mono small">0.648</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">SNPS</td>
+      <td class="mono">$516.48</td>
+      <td class="mono">$519.70</td>
+      <td class="mono" style="color:#1a6b3a">-0.6% below support</td>
+      <td class="mono">$533.42</td>
+      <td class="mono">$533.42</td>
+      <td class="mono">124%</td>
+      <td class="mono">14.7%</td>
+      <td class="mono muted">Dec 10–Jan 08</td>
+      <td class="mono">81d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:63%"></div></div>
+        <span class="mono small">0.631</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">FCX</td>
+      <td class="mono">$61.65</td>
+      <td class="mono">$62.40</td>
+      <td class="mono" style="color:#1a6b3a">-1.2% below support</td>
+      <td class="mono">$65.10</td>
+      <td class="mono">$70.36</td>
+      <td class="mono">109%</td>
+      <td class="mono">19.8%</td>
+      <td class="mono muted">Mar 10–Apr 07</td>
+      <td class="mono">22d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:63%"></div></div>
+        <span class="mono small">0.631</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">BRK-B</td>
+      <td class="mono">$475.94</td>
+      <td class="mono">$496.39</td>
+      <td class="mono" style="color:#b07d2a">-4.1% below support</td>
+      <td class="mono">$513.11</td>
+      <td class="mono">$513.81</td>
+      <td class="mono">217%</td>
+      <td class="mono">4.4%</td>
+      <td class="mono muted">Oct 10–Nov 06</td>
+      <td class="mono">120d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:61%"></div></div>
+        <span class="mono small">0.616</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">DIS</td>
+      <td class="mono">$108.02</td>
+      <td class="mono">$111.46</td>
+      <td class="mono" style="color:#b07d2a">-3.1% below support</td>
+      <td class="mono">$114.48</td>
+      <td class="mono">$115.88</td>
+      <td class="mono">178%</td>
+      <td class="mono">9.3%</td>
+      <td class="mono muted">Nov 13–Dec 11</td>
+      <td class="mono">92d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:61%"></div></div>
+        <span class="mono small">0.610</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">NEM</td>
+      <td class="mono">$116.51</td>
+      <td class="mono">$114.63</td>
+      <td class="mono" style="color:#1a6b3a">+1.6% above support</td>
+      <td class="mono">$118.94</td>
+      <td class="mono">$131.95</td>
+      <td class="mono">89%</td>
+      <td class="mono">15.4%</td>
+      <td class="mono muted">Dec 18–Jan 16</td>
+      <td class="mono">76d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:60%"></div></div>
+        <span class="mono small">0.600</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">OXY</td>
+      <td class="mono">$53.03</td>
+      <td class="mono">$52.43</td>
+      <td class="mono" style="color:#1a6b3a">+1.1% above support</td>
+      <td class="mono">$54.21</td>
+      <td class="mono">$66.24</td>
+      <td class="mono">96%</td>
+      <td class="mono">19.7%</td>
+      <td class="mono muted">Jan 29–Feb 26</td>
+      <td class="mono">48d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:59%"></div></div>
+        <span class="mono small">0.592</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">LOW</td>
+      <td class="mono">$229.20</td>
+      <td class="mono">$228.64</td>
+      <td class="mono" style="color:#1a6b3a">+0.2% above support</td>
+      <td class="mono">$233.81</td>
+      <td class="mono">$287.39</td>
+      <td class="mono">99%</td>
+      <td class="mono">6.3%</td>
+      <td class="mono muted">Jun 25–Jul 23</td>
+      <td class="mono">192d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:58%"></div></div>
+        <span class="mono small">0.585</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">VLO</td>
+      <td class="mono">$241.06</td>
+      <td class="mono">$235.81</td>
+      <td class="mono" style="color:#b07d2a">+2.2% above support</td>
+      <td class="mono">$242.07</td>
+      <td class="mono">$254.32</td>
+      <td class="mono">72%</td>
+      <td class="mono">19.5%</td>
+      <td class="mono muted">Feb 17–Mar 16</td>
+      <td class="mono">35d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:58%"></div></div>
+        <span class="mono small">0.581</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">META</td>
+      <td class="mono">$609.63</td>
+      <td class="mono">$629.86</td>
+      <td class="mono" style="color:#b07d2a">-3.2% below support</td>
+      <td class="mono">$662.49</td>
+      <td class="mono">$688.55</td>
+      <td class="mono">134%</td>
+      <td class="mono">19.8%</td>
+      <td class="mono muted">Mar 13–Apr 10</td>
+      <td class="mono">18d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:57%"></div></div>
+        <span class="mono small">0.575</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">ABBV</td>
+      <td class="mono">$201.55</td>
+      <td class="mono">$201.47</td>
+      <td class="mono" style="color:#1a6b3a">+0.0% above support</td>
+      <td class="mono">$206.69</td>
+      <td class="mono">$244.38</td>
+      <td class="mono">100%</td>
+      <td class="mono">9.0%</td>
+      <td class="mono muted">Jul 17–Aug 13</td>
+      <td class="mono">183d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:57%"></div></div>
+        <span class="mono small">0.575</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">VZ</td>
+      <td class="mono">$47.22</td>
+      <td class="mono">$45.06</td>
+      <td class="mono" style="color:#b07d2a">+4.8% above support</td>
+      <td class="mono">$46.25</td>
+      <td class="mono">$51.38</td>
+      <td class="mono">66%</td>
+      <td class="mono">4.4%</td>
+      <td class="mono muted">Aug 20–Oct 01</td>
+      <td class="mono">66d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:55%"></div></div>
+        <span class="mono small">0.554</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">XOM</td>
+      <td class="mono">$144.57</td>
+      <td class="mono">$141.40</td>
+      <td class="mono" style="color:#b07d2a">+2.2% above support</td>
+      <td class="mono">$147.59</td>
+      <td class="mono">$171.47</td>
+      <td class="mono">90%</td>
+      <td class="mono">19.3%</td>
+      <td class="mono muted">Jan 02–Jan 30</td>
+      <td class="mono">65d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:53%"></div></div>
+        <span class="mono small">0.536</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="sym">TMO</td>
+      <td class="mono">$465.00</td>
+      <td class="mono">$466.71</td>
+      <td class="mono" style="color:#1a6b3a">-0.4% below support</td>
+      <td class="mono">$478.32</td>
+      <td class="mono">$639.45</td>
+      <td class="mono">101%</td>
+      <td class="mono">15.3%</td>
+      <td class="mono muted">Jun 25–Jul 23</td>
+      <td class="mono">198d</td>
+      <td>
+        <div class="bar-bg"><div class="bar-fill" style="width:44%"></div></div>
+        <span class="mono small">0.448</span>
+      </td>
+    </tr></tbody></table></div>
+
+</div>
+
+<footer>
+  Pattern scanner: Consolidation → Breakout → Retest &nbsp;·&nbsp;
+  Data: Finnhub &nbsp;·&nbsp; Universe: 99 stocks &nbsp;·&nbsp;
+  Generated 2026-05-11 16:07 UTC &nbsp;·&nbsp; Personal research only — not investment advice
+</footer>
+
+</body>
+</html>
