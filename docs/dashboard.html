@@ -111,7 +111,7 @@ td.na{color:var(--ink3)}
   <div class="mast-right">
     <a class="nav-link" href="./">Screener</a>
     <a class="nav-link active" href="./dashboard.html">Dashboard</a>
-    <span class="ts mono">29 Jul 2026 · 10:09</span>
+    <span class="ts mono">29 Jul 2026 · 10:41</span>
   </div>
 </header>
 
@@ -147,6 +147,11 @@ td.na{color:var(--ink3)}
       <td class="name">Russell 2000 <span class="sym">IWM</span></td>
       <td class="price mono">$293.37</td>
       <td class="green">+0.16%</td><td class="red">-1.07%</td><td class="red">-2.15%</td><td class="green">+5.86%</td><td class="green">+11.13%</td><td class="green">+31.74%</td><td class="green">+31.74%</td>
+    </tr>
+    <tr>
+      <td class="name">VIX ETF <span class="sym">VIXY</span></td>
+      <td class="price mono">$21.24</td>
+      <td class="red">-0.65%</td><td class="green">+2.81%</td><td class="red">-6.10%</td><td class="red">-23.62%</td><td class="red">-17.13%</td><td class="red">-48.25%</td><td class="red">-48.25%</td>
     </tr></tbody>
     </table>
   </div>
@@ -273,7 +278,16 @@ td.na{color:var(--ink3)}
 <!-- ── COT POSITIONING ────────────────────────────────────── -->
 <h2 class="section-title">COT Positioning (Non-Commercial)</h2>
 <div class="cot-grid">
-  <div class="cot-item"><div class="cot-label">S&P 500</div><div class="cot-na">No data</div></div>
+  
+  <div class="cot-item">
+    <div class="cot-header">
+      <span class="cot-name">S&P 500</span>
+      <span class="badge badge-short">NET SHORT -4.0%</span>
+      <span class="cot-date mono">2026-07-21</span>
+    </div>
+    <div class="cot-track"><div class="cot-bar bar-short" style="width:4.0%"></div></div>
+    <div class="cot-nums mono">Long 251,249 · Short 272,247 · Net -20,998</div>
+  </div>
   <div class="cot-item">
     <div class="cot-header">
       <span class="cot-name">Nasdaq 100</span>
@@ -309,19 +323,76 @@ td.na{color:var(--ink3)}
     </div>
     <div class="cot-track"><div class="cot-bar bar-short" style="width:8.6%"></div></div>
     <div class="cot-nums mono">Long 220,465 · Short 261,803 · Net -41,338</div>
-  </div><div class="cot-item"><div class="cot-label">USD Index</div><div class="cot-na">No data</div></div>
+  </div>
+  <div class="cot-item">
+    <div class="cot-header">
+      <span class="cot-name">USD Index</span>
+      <span class="badge badge-long">NET LONG +30.7%</span>
+      <span class="cot-date mono">2026-07-21</span>
+    </div>
+    <div class="cot-track"><div class="cot-bar bar-long" style="width:30.7%"></div></div>
+    <div class="cot-nums mono">Long 33,270 · Short 17,656 · Net +15,614</div>
+  </div>
 </div>
 
 <!-- ── NEWS ──────────────────────────────────────────────── -->
 <h2 class="section-title">Market News</h2>
 <div class="news-grid">
   
+  <a class="news-card" href="https://www.cnbc.com/2026/07/28/the-dow-jumps-as-the-ai-trade-wobbles-plus-a-portfolio-name-goes-on-the-ma-hunt.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 28 Jul 23:15</div>
+    <div class="news-headline">The Dow jumps as the AI trade wobbles. Plus, a portfolio name goes on the M&A hunt</div>
+  </a>
+  <a class="news-card" href="https://www.cnbc.com/2026/07/28/jim-cramer-jj-talc-settlement-is-good-for-a-stock-that-has-so-much-going-for-it-already.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 28 Jul 22:29</div>
+    <div class="news-headline">Jim Cramer: J&J talc settlement is good for a stock that has so much going for it already</div>
+  </a>
+  <a class="news-card" href="https://www.cnbc.com/2026/07/28/were-trimming-a-rallying-stock-to-protect-against-a-potential-earnings-letdown-.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 28 Jul 22:17</div>
+    <div class="news-headline">We're trimming a rallying stock to protect against a potential earnings letdown</div>
+  </a>
+  <a class="news-card" href="https://www.cnbc.com/2026/07/28/were-buying-the-dip-on-one-of-our-stocks-for-two-key-reasons.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 28 Jul 21:45</div>
+    <div class="news-headline">We're buying the dip on one of our stocks for two key reasons</div>
+  </a>
+  <a class="news-card" href="https://www.cnbc.com/2026/07/28/jim-cramers-top-10-things-to-watch-in-the-stock-market-tuesday.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 28 Jul 16:57</div>
+    <div class="news-headline">Jim Cramer's top 10 things to watch in the stock market Tuesday</div>
+  </a>
+  <a class="news-card" href="https://www.cnbc.com/2026/07/28/coca-cola-ko-q2-2026-earnings.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 28 Jul 14:25</div>
+    <div class="news-headline">Coca-Cola is about to report earnings. Here's what to expect</div>
+  </a>
+  <a class="news-card" href="https://www.bloomberg.com/news/articles/2026-07-28/hsbc-uses-leverage-to-win-5-5-billion-in-india-forex-deposits" target="_blank" rel="noopener">
+    <div class="news-meta mono">Bloomberg · 28 Jul 07:54</div>
+    <div class="news-headline">HSBC uses leverage to win $5.5 billion in India Forex deposits</div>
+  </a>
+  <a class="news-card" href="https://www.bloomberg.com/news/articles/2026-07-28/anthropic-s-amodei-rejects-open-model-ban-but-calls-for-testing" target="_blank" rel="noopener">
+    <div class="news-meta mono">Bloomberg · 28 Jul 07:18</div>
+    <div class="news-headline">Anthropic’s Dario Amodei rejects open model ban but calls for testing</div>
+  </a>
+  <a class="news-card" href="https://www.cnbc.com/2026/07/27/apple-most-valuable-company-nvidia.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 28 Jul 01:12</div>
+    <div class="news-headline">Apple ends day as world's most valuable company, passing Nvidia</div>
+  </a>
+  <a class="news-card" href="https://www.cnbc.com/2026/07/27/nvidias-potential-250b-backstop-for-openai-is-another-strike-against-the-ai-trade.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 27 Jul 23:46</div>
+    <div class="news-headline">Nvidia's potential $250B backstop for OpenAI is another strike against the AI trade</div>
+  </a>
+  <a class="news-card" href="https://www.cnbc.com/2026/07/27/from-oil-to-shock-heres-what-kalshi-traders-expect-warsh-to-say.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 27 Jul 22:58</div>
+    <div class="news-headline">From 'oil' to 'shock',  here's what Kalshi traders expect Fed Chair Kevin Warsh will say this week</div>
+  </a>
+  <a class="news-card" href="https://www.cnbc.com/2026/07/27/more-tech-pain-means-gains-elsewhere-what-is-winning-in-the-mixed-market.html" target="_blank" rel="noopener">
+    <div class="news-meta mono">CNBC · 27 Jul 22:40</div>
+    <div class="news-headline">More tech pain means gains elsewhere. What's winning in Monday's mixed market</div>
+  </a>
 </div>
 
 </div><!-- /wrap -->
 
 <footer class="footer">
-  Data: Finnhub · CFTC &nbsp;|&nbsp; Generated 29 Jul 2026 · 10:09 &nbsp;|&nbsp; Personal research only — not investment advice
+  Data: Finnhub · CFTC &nbsp;|&nbsp; Generated 29 Jul 2026 · 10:41 &nbsp;|&nbsp; Personal research only — not investment advice
 </footer>
 
 </body>
