@@ -193,7 +193,7 @@ def parse(ticker):
     pe_ttm       = get_metric(m, "peBasicExclExtraTTM")
     pb           = get_metric(m, "pbAnnual")
     roe          = get_metric(m, "roeTTM")
-    gross_margin = get_metric(m, "grossMarginTTM")   # replaces netMarginTTM (often null)
+    gross_margin = get_metric(m, "grossMarginTTM")
     rev_growth   = get_metric(m, "revenueGrowthTTMYoy")
     eps_growth   = get_metric(m, "epsGrowthTTMYoy")
     w52_high     = get_metric(m, "52WeekHigh")
@@ -265,7 +265,7 @@ df["mom_52w"]         = df["w52_pos"].apply(
     lambda x: (1 - abs(x - 0.45) / 0.55) if pd.notna(x) else 0.5).clip(0, 1)
 df["score_momentum"]  = df["mom_52w"]*0.50 + norm(df["upside_pct"])*0.50
 
-# Quality — grossMarginTTM instead of netMarginTTM (consistently populated)
+# Quality
 df["score_quality"]   = (norm(df["roe"])*0.40 +
                          norm(df["gross_margin"])*0.35 +
                          norm(df["rev_growth"])*0.25)
@@ -339,30 +339,34 @@ RISK TAG: Pick exactly one: Speculative | Growth | Value | Quality | Turnaround"
 
 def generate_thesis(row, max_retries=4):
     """Call Claude with retry/backoff for rate-limit and overload errors."""
-    backoff = [5, 15, 30, 60]
+    backoff = [10, 30, 60, 90]
     for attempt in range(max_retries):
         try:
             msg = claude.messages.create(
                 model="claude-haiku-4-5-20251001",
-                max_tokens=600,
+                max_tokens=800,
                 system=SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": build_prompt(row)}]
             )
             text = msg.content[0].text.strip()
-            snippet = text[:100].replace("\n", " ")
-            print(f"\n    raw: {snippet}...")
+            # Print FULL response for debugging
+            print(f"\n--- {row['ticker']} RAW RESPONSE ---")
+            print(text)
+            print(f"--- END {row['ticker']} ---")
             return text
         except anthropic.RateLimitError as e:
             wait = backoff[min(attempt, len(backoff)-1)]
-            print(f"\n    RateLimitError attempt {attempt+1}/{max_retries} — waiting {wait}s")
+            print(f"\n    RateLimitError attempt {attempt+1}/{max_retries} for {row['ticker']} — waiting {wait}s")
+            print(f"    Details: {e}")
             time.sleep(wait)
         except anthropic.APIStatusError as e:
             wait = backoff[min(attempt, len(backoff)-1)]
-            print(f"\n    APIStatusError {e.status_code} attempt {attempt+1}/{max_retries} — waiting {wait}s: {e.message}")
+            print(f"\n    APIStatusError {e.status_code} attempt {attempt+1}/{max_retries} for {row['ticker']} — waiting {wait}s")
+            print(f"    Details: {e.message}")
             time.sleep(wait)
         except Exception as e:
             wait = backoff[min(attempt, len(backoff)-1)]
-            print(f"\n    Error attempt {attempt+1}/{max_retries} — waiting {wait}s: {type(e).__name__}: {e}")
+            print(f"\n    Error attempt {attempt+1}/{max_retries} for {row['ticker']}: {type(e).__name__}: {e}")
             if attempt < max_retries - 1:
                 time.sleep(wait)
     print(f"\n    FAILED after {max_retries} attempts for {row['ticker']}")
@@ -388,16 +392,16 @@ top_picks = df.head(TOP_N_OUTPUT).copy()
 
 raw_theses = []
 for _, row in top_picks.iterrows():
-    print(f"  [{int(row['rank']):02d}] {row['ticker']:6s}...", end=" ", flush=True)
+    print(f"\n[{int(row['rank']):02d}] Calling Claude for {row['ticker']}...")
     raw_theses.append(generate_thesis(row))
-    print("✓")
-    time.sleep(2)  # 2s between calls to stay well under rate limits
+    time.sleep(5)  # 5s between calls
 
 top_picks["thesis_raw"] = raw_theses
 for key in ["thesis", "bull", "bear", "risk_tag"]:
     top_picks[key] = top_picks["thesis_raw"].apply(
         lambda r, k=key: parse_sections(r)[k])
 
+print()
 print("✓ Theses generated")
 empty_count = top_picks["thesis"].eq("").sum()
 if empty_count:
@@ -448,7 +452,7 @@ for _, row in top_picks.iterrows():
         "pe_ttm":          safe_float(row["pe_ttm"], 2),
         "pb":              safe_float(row["pb"], 2),
         "roe":             safe_float(row["roe"], 2),
-        "net_margin":      safe_float(row["gross_margin"], 2),  # key kept for HTML compatibility
+        "net_margin":      safe_float(row["gross_margin"], 2),
         "rev_growth":      safe_float(row["rev_growth"], 2),
         "w52_pos":         safe_float(row["w52_pos"], 3),
         "w52_high":        safe_float(row["w52_high"], 2),
