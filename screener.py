@@ -349,7 +349,6 @@ def generate_thesis(row, max_retries=4):
                 messages=[{"role": "user", "content": build_prompt(row)}]
             )
             text = msg.content[0].text.strip()
-            # Print FULL response for debugging
             print(f"\n--- {row['ticker']} RAW RESPONSE ---")
             print(text)
             print(f"--- END {row['ticker']} ---")
@@ -373,14 +372,19 @@ def generate_thesis(row, max_retries=4):
     return ""
 
 def parse_sections(raw_text):
+    """
+    Parse the 4 sections from Claude's response.
+    Colon after the label is optional — Claude sometimes omits it.
+    Pattern: LABEL (optional colon) (optional whitespace) content
+    """
     result = {"thesis": "", "bull": "", "bear": "", "risk_tag": ""}
     if not raw_text:
         return result
     patterns = {
-        "thesis":   r"THESIS:(.*?)(?=BULL CASE:|BEAR CASE:|RISK TAG:|$)",
-        "bull":     r"BULL CASE:(.*?)(?=BEAR CASE:|RISK TAG:|$)",
-        "bear":     r"BEAR CASE:(.*?)(?=RISK TAG:|$)",
-        "risk_tag": r"RISK TAG:(.*?)$",
+        "thesis":   r"THESIS:?\s*(.*?)(?=BULL CASE|BEAR CASE|RISK TAG|$)",
+        "bull":     r"BULL CASE:?\s*(.*?)(?=BEAR CASE|RISK TAG|$)",
+        "bear":     r"BEAR CASE:?\s*(.*?)(?=RISK TAG|$)",
+        "risk_tag": r"RISK TAG:?\s*(.*?)$",
     }
     for key, pat in patterns.items():
         m = re.search(pat, raw_text, re.DOTALL | re.IGNORECASE)
@@ -394,7 +398,7 @@ raw_theses = []
 for _, row in top_picks.iterrows():
     print(f"\n[{int(row['rank']):02d}] Calling Claude for {row['ticker']}...")
     raw_theses.append(generate_thesis(row))
-    time.sleep(5)  # 5s between calls
+    time.sleep(5)
 
 top_picks["thesis_raw"] = raw_theses
 for key in ["thesis", "bull", "bear", "risk_tag"]:
