@@ -320,12 +320,12 @@ Analyst mean target: ${row['mean_target']}  |  Upside: {upside}
 Analyst consensus: {row['strong_buy']} strong buy / {row['buy']} buy / {row['hold']} hold / {row['sell']} sell
 Earnings in next 45 days: {'Yes' if row['has_earnings'] else 'No'}
 
-Scores (0=worst, 1=best vs full S&P 500 universe):
-  Value={row['score_value']:.2f}  Momentum={row['score_momentum']:.2f}  Quality={row['score_quality']:.2f}
-  Sentiment={row['score_sentiment']:.2f}  Catalyst={row['score_catalyst']:.2f}
-  Composite={row['score_composite']:.3f}
-
 Write exactly 4 labelled sections. Plain English only — no jargon, no markdown.
+Never mention score numbers or scoring systems. Instead reference the actual metrics
+above directly — use the real numbers (e.g. "ROE of 25%", "gross margins of 68%",
+"13x trailing earnings", "37% upside to analyst targets", "25 of 30 analysts rate
+it buy or strong buy"). Make the writing feel like a human analyst who has read
+the data, not a model reporting scores.
 
 THESIS: Why this stock stands out this week. 1-2 sentences.
 BULL CASE: The single strongest reason it could do well. 1-2 sentences.
