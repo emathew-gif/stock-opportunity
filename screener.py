@@ -311,12 +311,20 @@ def build_prompt(row):
     upside = f"{row['upside_pct']:.1f}%" if pd.notna(row['upside_pct']) else "N/A"
     w52    = f"{row['w52_pos']:.0%}"      if pd.notna(row['w52_pos'])    else "N/A"
     gm     = f"{row['gross_margin']:.1f}%" if pd.notna(row['gross_margin']) else "N/A"
+    pe     = f"{row['pe_ttm']:.1f}x" if pd.notna(row['pe_ttm']) else "N/A"
+    pb     = f"{row['pb']:.1f}x"     if pd.notna(row['pb'])     else "N/A"
+    roe    = f"{row['roe']:.1f}%"    if pd.notna(row['roe'])    else "N/A"
+    revg   = f"{row['rev_growth']:.1f}%" if pd.notna(row['rev_growth']) else "N/A"
+    epsg   = f"{row['eps_growth']:.1f}%" if pd.notna(row['eps_growth']) else "N/A"
+    tgt    = f"${row['mean_target']:.2f}" if pd.notna(row['mean_target']) else "N/A"
+    w52h   = f"${row['w52_high']:.2f}"   if pd.notna(row['w52_high'])   else "N/A"
+    w52l   = f"${row['w52_low']:.2f}"    if pd.notna(row['w52_low'])    else "N/A"
     return f"""Stock: {row['ticker']} — {row['name']} ({row['sector']})
-Price: ${row['price']:.2f}  |  P/E (TTM): {row['pe_ttm']}  |  P/B: {row['pb']}
-ROE: {row['roe']}%  |  Gross margin: {gm}  |  Revenue growth YoY: {row['rev_growth']}%
-EPS growth YoY: {row['eps_growth']}%
-52-week position: {w52} of range  |  52w high: ${row['w52_high']}  |  52w low: ${row['w52_low']}
-Analyst mean target: ${row['mean_target']}  |  Upside: {upside}
+Price: ${row['price']:.2f}  |  P/E (TTM): {pe}  |  P/B: {pb}
+ROE: {roe}  |  Gross margin: {gm}  |  Revenue growth YoY: {revg}
+EPS growth YoY: {epsg}
+52-week position: {w52} of range  |  52w high: {w52h}  |  52w low: {w52l}
+Analyst mean target: {tgt}  |  Upside: {upside}
 Analyst consensus: {row['strong_buy']} strong buy / {row['buy']} buy / {row['hold']} hold / {row['sell']} sell
 Earnings in next 45 days: {'Yes' if row['has_earnings'] else 'No'}
 
@@ -337,16 +345,25 @@ may differ materially.
 RISK TAG: Pick exactly one: Speculative | Growth | Value | Quality | Turnaround"""
 
 def generate_thesis(row):
-    msg = claude.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=500,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": build_prompt(row)}]
-    )
-    return msg.content[0].text.strip()
+    try:
+        msg = claude.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=500,
+            system=SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": build_prompt(row)}]
+        )
+        text = msg.content[0].text.strip()
+        snippet = text[:100].replace("\n", " ")
+        print(f"\n    raw: {snippet}...")
+        return text
+    except Exception as e:
+        print(f"\n    ERROR calling Claude for {row['ticker']}: {e}")
+        return ""
 
 def parse_sections(raw_text):
     result = {"thesis": "", "bull": "", "bear": "", "risk_tag": ""}
+    if not raw_text:
+        return result
     patterns = {
         "thesis":   r"THESIS:(.*?)(?=BULL CASE:|BEAR CASE:|RISK TAG:|$)",
         "bull":     r"BULL CASE:(.*?)(?=BEAR CASE:|RISK TAG:|$)",
@@ -366,7 +383,7 @@ for _, row in top_picks.iterrows():
     print(f"  [{int(row['rank']):02d}] {row['ticker']:6s}...", end=" ", flush=True)
     raw_theses.append(generate_thesis(row))
     print("✓")
-    time.sleep(0.3)
+    time.sleep(1.5)  # increased from 0.3s to reduce rate-limit risk
 
 top_picks["thesis_raw"] = raw_theses
 for key in ["thesis", "bull", "bear", "risk_tag"]:
@@ -374,6 +391,10 @@ for key in ["thesis", "bull", "bear", "risk_tag"]:
         lambda r, k=key: parse_sections(r)[k])
 
 print("✓ Theses generated")
+empty_count = top_picks["thesis"].eq("").sum()
+if empty_count:
+    empty_tickers = top_picks[top_picks["thesis"] == ""]["ticker"].tolist()
+    print(f"  ⚠ {empty_count} stocks with empty thesis: {empty_tickers}")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP 6 — Build output JSON
