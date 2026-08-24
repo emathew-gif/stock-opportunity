@@ -308,23 +308,16 @@ specific, and data-driven. Write in plain English — avoid jargon.
 Do not use any markdown formatting, asterisks, or bold markers."""
 
 def build_prompt(row):
-    upside = f"{row['upside_pct']:.1f}%" if pd.notna(row['upside_pct']) else "N/A"
-    w52    = f"{row['w52_pos']:.0%}"      if pd.notna(row['w52_pos'])    else "N/A"
-    gm     = f"{row['gross_margin']:.1f}%" if pd.notna(row['gross_margin']) else "N/A"
-    pe     = f"{row['pe_ttm']:.1f}x" if pd.notna(row['pe_ttm']) else "N/A"
-    pb     = f"{row['pb']:.1f}x"     if pd.notna(row['pb'])     else "N/A"
-    roe    = f"{row['roe']:.1f}%"    if pd.notna(row['roe'])    else "N/A"
-    revg   = f"{row['rev_growth']:.1f}%" if pd.notna(row['rev_growth']) else "N/A"
-    epsg   = f"{row['eps_growth']:.1f}%" if pd.notna(row['eps_growth']) else "N/A"
-    tgt    = f"${row['mean_target']:.2f}" if pd.notna(row['mean_target']) else "N/A"
-    w52h   = f"${row['w52_high']:.2f}"   if pd.notna(row['w52_high'])   else "N/A"
-    w52l   = f"${row['w52_low']:.2f}"    if pd.notna(row['w52_low'])    else "N/A"
+    def fmt_pct(v):  return f"{v:.1f}%" if pd.notna(v) else "N/A"
+    def fmt_x(v):    return f"{v:.1f}x"  if pd.notna(v) else "N/A"
+    def fmt_d(v):    return f"${v:.2f}"  if pd.notna(v) else "N/A"
+    def fmt_w52(v):  return f"{v:.0%}"   if pd.notna(v) else "N/A"
     return f"""Stock: {row['ticker']} — {row['name']} ({row['sector']})
-Price: ${row['price']:.2f}  |  P/E (TTM): {pe}  |  P/B: {pb}
-ROE: {roe}  |  Gross margin: {gm}  |  Revenue growth YoY: {revg}
-EPS growth YoY: {epsg}
-52-week position: {w52} of range  |  52w high: {w52h}  |  52w low: {w52l}
-Analyst mean target: {tgt}  |  Upside: {upside}
+Price: ${row['price']:.2f}  |  P/E (TTM): {fmt_x(row['pe_ttm'])}  |  P/B: {fmt_x(row['pb'])}
+ROE: {fmt_pct(row['roe'])}  |  Gross margin: {fmt_pct(row['gross_margin'])}  |  Revenue growth YoY: {fmt_pct(row['rev_growth'])}
+EPS growth YoY: {fmt_pct(row['eps_growth'])}
+52-week position: {fmt_w52(row['w52_pos'])} of range  |  52w high: {fmt_d(row['w52_high'])}  |  52w low: {fmt_d(row['w52_low'])}
+Analyst mean target: {fmt_d(row['mean_target'])}  |  Upside: {fmt_pct(row['upside_pct'])}
 Analyst consensus: {row['strong_buy']} strong buy / {row['buy']} buy / {row['hold']} hold / {row['sell']} sell
 Earnings in next 45 days: {'Yes' if row['has_earnings'] else 'No'}
 
@@ -344,21 +337,36 @@ or economic slowdown. Analyst price targets are estimates and actual results
 may differ materially.
 RISK TAG: Pick exactly one: Speculative | Growth | Value | Quality | Turnaround"""
 
-def generate_thesis(row):
-    try:
-        msg = claude.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=500,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": build_prompt(row)}]
-        )
-        text = msg.content[0].text.strip()
-        snippet = text[:100].replace("\n", " ")
-        print(f"\n    raw: {snippet}...")
-        return text
-    except Exception as e:
-        print(f"\n    ERROR calling Claude for {row['ticker']}: {e}")
-        return ""
+def generate_thesis(row, max_retries=4):
+    """Call Claude with retry/backoff for rate-limit and overload errors."""
+    backoff = [5, 15, 30, 60]
+    for attempt in range(max_retries):
+        try:
+            msg = claude.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=600,
+                system=SYSTEM_PROMPT,
+                messages=[{"role": "user", "content": build_prompt(row)}]
+            )
+            text = msg.content[0].text.strip()
+            snippet = text[:100].replace("\n", " ")
+            print(f"\n    raw: {snippet}...")
+            return text
+        except anthropic.RateLimitError as e:
+            wait = backoff[min(attempt, len(backoff)-1)]
+            print(f"\n    RateLimitError attempt {attempt+1}/{max_retries} — waiting {wait}s")
+            time.sleep(wait)
+        except anthropic.APIStatusError as e:
+            wait = backoff[min(attempt, len(backoff)-1)]
+            print(f"\n    APIStatusError {e.status_code} attempt {attempt+1}/{max_retries} — waiting {wait}s: {e.message}")
+            time.sleep(wait)
+        except Exception as e:
+            wait = backoff[min(attempt, len(backoff)-1)]
+            print(f"\n    Error attempt {attempt+1}/{max_retries} — waiting {wait}s: {type(e).__name__}: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(wait)
+    print(f"\n    FAILED after {max_retries} attempts for {row['ticker']}")
+    return ""
 
 def parse_sections(raw_text):
     result = {"thesis": "", "bull": "", "bear": "", "risk_tag": ""}
@@ -383,7 +391,7 @@ for _, row in top_picks.iterrows():
     print(f"  [{int(row['rank']):02d}] {row['ticker']:6s}...", end=" ", flush=True)
     raw_theses.append(generate_thesis(row))
     print("✓")
-    time.sleep(1.5)  # increased from 0.3s to reduce rate-limit risk
+    time.sleep(2)  # 2s between calls to stay well under rate limits
 
 top_picks["thesis_raw"] = raw_theses
 for key in ["thesis", "bull", "bear", "risk_tag"]:
@@ -395,6 +403,8 @@ empty_count = top_picks["thesis"].eq("").sum()
 if empty_count:
     empty_tickers = top_picks[top_picks["thesis"] == ""]["ticker"].tolist()
     print(f"  ⚠ {empty_count} stocks with empty thesis: {empty_tickers}")
+else:
+    print("  All 10 theses populated successfully")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP 6 — Build output JSON
@@ -406,7 +416,10 @@ print("=" * 60)
 
 def safe_float(v, dp=2):
     try:
-        return round(float(v), dp)
+        f = float(v)
+        if pd.isna(f):
+            return None
+        return round(f, dp)
     except Exception:
         return None
 
