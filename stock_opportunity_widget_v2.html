@@ -97,12 +97,11 @@
     background: var(--ink);
     color: var(--paper);
     position: relative;
-    overflow: hidden;
   }
   .hero-left::before {
     content: '';
     position: absolute;
-    top: -60px; right: -60px;
+    top: 0; right: -60px;
     width: 240px; height: 240px;
     border-radius: 50%;
     background: var(--accent);
@@ -679,7 +678,7 @@ function renderTable() {
                     : 'var(--ink3)';
 
     return `<tr class="${p.is_featured ? 'featured-row':''} ${selectedIdx===i?'selected':''}"
-               data-idx="${i}" onclick="selectRow(${i}, sorted_${i})">
+               data-idx="${i}">
       <td style="color:var(--ink3);font-family:var(--mono);font-size:11px">${p.rank}</td>
       <td>
         <div class="ticker-cell">
@@ -703,12 +702,10 @@ function renderTable() {
     </tr>`;
   });
 
-  // inject sorted picks as scoped variable via data-idx mapping
   window._sortedPicks = sorted;
   window._filteredPicks = filtered;
   document.getElementById('watchlist-body').innerHTML = rows.join('');
 
-  // bind clicks after render
   document.querySelectorAll('#watchlist-body tr').forEach((tr, i) => {
     tr.addEventListener('click', () => selectRow(i, window._sortedPicks));
   });
@@ -722,14 +719,11 @@ function selectRow(i, sortedArr) {
   selectedIdx = i;
   renderTable();
 
-  // Flash the hero left panel to signal the update
   const heroLeft = document.querySelector('.hero-left');
   heroLeft.style.transition = 'opacity 0.15s';
   heroLeft.style.opacity = '0';
   setTimeout(() => {
     renderHero(p);
-    // Update eyebrow — show "Featured Pick" only if it's the featured one
-    // Update sector label in masthead
   const sectorBadge = document.getElementById('hero-sector');
   if (sectorBadge) sectorBadge.textContent = p.sector || '';
   document.getElementById('hero-eyebrow').textContent =
@@ -737,7 +731,6 @@ function selectRow(i, sortedArr) {
     heroLeft.style.opacity = '1';
   }, 150);
 
-  // Scroll to top so hero is visible
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
